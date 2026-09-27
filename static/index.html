@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente Scraper — Ingesta y Grafo MCP</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'med-navy': '#00478d',
+                        'clinical-teal': '#006a68',
+                        'cyan-accent': '#79f2f0',
+                        'cyan-dark': '#00504f',
+                        'med-bg': '#090d16',
+                        'med-card': 'rgba(13, 20, 36, 0.85)',
+                        'med-border': 'rgba(194, 198, 212, 0.18)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        @keyframes pulse-ring {
+            0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(0, 106, 104, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(0, 106, 104, 0); }
+            100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(0, 106, 104, 0); }
+        }
+        .pulse-animation {
+            animation: pulse-ring 2.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        .glass-card {
+            background: rgba(13, 20, 36, 0.85);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(194, 198, 212, 0.16);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #006a68; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #79f2f0; }
+    </style>
+</head>
+<body class="bg-med-bg text-slate-100 min-h-screen font-sans selection:bg-cyan-accent selection:text-cyan-dark flex flex-col justify-between">
+
+    <!-- Header Limpio con Identidad de Enfermería -->
+    <header class="border-b border-med-border/70 bg-med-bg/90 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-med-navy to-clinical-teal flex items-center justify-center border border-cyan-accent/30 shadow-md">
+                    <svg class="w-5 h-5 text-cyan-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+                        <span>AGENTE SCRAPER</span>
+                        <span class="text-[10px] font-mono font-bold bg-med-navy px-1.5 py-0.5 rounded text-cyan-accent">PROJ-001</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400">Grafo de Conocimiento Obsidian vía MCP</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-[#006a68]/20 border border-[#006a68]/50 px-3 py-1 rounded-full pulse-animation">
+                    <span class="w-2 h-2 rounded-full bg-cyan-accent animate-pulse"></span>
+                    <span class="text-xs font-semibold text-cyan-accent font-mono">MCP ACTIVO</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA PRINCIPAL DE CONTENIDO -->
+    <main class="max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 flex-1 flex flex-col justify-center">
+
+        <!-- ============================================================= -->
+        <!-- PANTALLA 1: FORMULARIO PRINCIPAL LIMPIO (SOLO ENTRADA Y BOTÓN) -->
+        <!-- ============================================================= -->
+        <div id="view-form" class="space-y-6">
+            
+            <div class="text-center space-y-2 mb-2">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    Ingresar Documentación
+                </h2>
+                <p class="text-sm text-slate-400 max-w-lg mx-auto">
+                    Pega el enlace, una lista de enlaces o sube un archivo <code class="text-cyan-accent font-mono">.txt</code> para crear los casos de uso y agregarlos al Grafo.
+                </p>
+            </div>
+
+            <!-- Tarjeta Central de Entrada -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5 border border-med-border">
+                
+                <!-- Área de Texto para Enlace o Lista -->
+                <div>
+                    <label for="input-urls" class="block text-xs font-mono font-semibold text-cyan-accent uppercase tracking-wider mb-2">
+                        Enlace o Lista de Enlaces
+                    </label>
+                    <textarea id="input-urls" rows="4" 
+                        placeholder="Pega aquí el link (ej: https://docs.python-requests.org/... o varios enlaces, uno por línea)" 
+                        class="w-full bg-slate-950/80 border border-med-border rounded-xl p-4 text-sm font-mono text-cyan-accent placeholder:text-slate-600 focus:outline-hidden focus:border-cyan-accent focus:ring-1 focus:ring-cyan-accent transition-all shadow-inner resize-y"></textarea>
+                </div>
+
+                <!-- Selector de Archivo .txt Alternativo -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-med-border/50">
+                    <div class="flex items-center gap-2">
+                        <label for="input-file" class="cursor-pointer text-xs font-mono text-slate-300 hover:text-cyan-accent flex items-center gap-2 px-3 py-1.5 bg-slate-900 rounded-lg border border-med-border hover:border-cyan-accent transition">
+                            <svg class="w-4 h-4 text-clinical-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <span id="file-label">O subir archivo .txt con enlaces</span>
+                        </label>
+                        <input type="file" id="input-file" accept=".txt" class="hidden" onchange="handleFileSelect(event)">
+                        <button id="clear-file-btn" onclick="clearFile()" class="hidden text-xs text-rose-400 hover:underline">✕ Quitar</button>
+                    </div>
+
+                    <!-- Presets Rápidos de 1 Clic -->
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-[11px] font-mono text-slate-500">Ejemplos:</span>
+                        <button onclick="setPreset('https://docs.python-requests.org/en/latest/user/quickstart/')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">Requests</button>
+                        <button onclick="setPreset('https://fastapi.tiangolo.com/tutorial/first-steps/')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">FastAPI</button>
+                        <button onclick="setPreset('https://tailwindcss.com/docs/installation/using-vite')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">Tailwind</button>
+                    </div>
+                </div>
+
+                <!-- Botón de Creación Principal -->
+                <div class="pt-2">
+                    <button id="btn-create" onclick="processCreation()" 
+                        class="w-full bg-cyan-accent hover:bg-[#58eae8] text-cyan-dark font-extrabold text-base rounded-xl py-4 px-6 flex items-center justify-center gap-3 shadow-lg hover:shadow-cyan-accent/20 transition-all active:scale-[0.98] cursor-pointer">
+                        <svg class="w-5 h-5 text-cyan-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span id="btn-create-text">Crear Casos de Uso y Agregar al Grafo</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- ESTADO DE CARGA (SPINNER CLÍNICO) -->
+        <!-- ============================================================= -->
+        <div id="view-loading" class="glass-card rounded-2xl p-12 text-center space-y-4 hidden border border-cyan-accent/40">
+            <div class="w-14 h-14 mx-auto rounded-full border-4 border-slate-800 border-t-cyan-accent animate-spin"></div>
+            <h3 class="text-lg font-bold text-white tracking-tight">Procesando Documentación con MCP...</h3>
+            <p id="loading-msg" class="text-xs font-mono text-cyan-accent max-w-md mx-auto">
+                Extrayendo contenido, consultando Grafo de Obsidian y formulando casos de uso minimalistas...
+            </p>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- PANTALLA 2: PÁGINA CREADA (NOMBRE, CASOS DE USO Y SCRIPTS) -->
+        <!-- ============================================================= -->
+        <div id="view-result" class="space-y-6 hidden">
+            
+            <!-- Barra Superior: Botón Volver y Acciones de Descarga -->
+            <div class="flex items-center justify-between gap-3">
+                <button onclick="backToForm()" class="text-xs font-mono font-semibold text-cyan-accent hover:text-white flex items-center gap-1.5 px-3 py-2 bg-slate-900/80 rounded-xl border border-med-border hover:border-cyan-accent transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span>← Procesar otro enlace</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <a id="res-html-btn" href="#" target="_blank" class="text-xs font-semibold px-3 py-2 bg-clinical-teal hover:bg-clinical-teal/80 text-white rounded-xl border border-cyan-accent/30 transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-cyan-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <span>Ver Página Web</span>
+                    </a>
+                    <a id="res-md-btn" href="#" download class="text-xs font-semibold px-3 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-accent rounded-xl border border-med-border transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Descargar Nota Obsidian (.md)</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjeta Principal del Caso de Uso Creado -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 border border-med-border">
+                
+                <!-- Encabezado con Nombre de la Documentación -->
+                <div class="pb-5 border-b border-med-border space-y-2">
+                    <div class="flex items-center gap-2">
+                        <span id="res-node-id" class="text-xs font-mono font-bold text-cyan-accent bg-med-navy px-2.5 py-0.5 rounded border border-med-navy">
+                            CU-000
+                        </span>
+                        <span id="res-complexity" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                            intermediate
+                        </span>
+                        <span class="text-[11px] font-mono text-slate-400">Agregado al Grafo vía MCP</span>
+                    </div>
+
+                    <h2 id="res-doc-title" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Nombre de la Documentación
+                    </h2>
+
+                    <a id="res-source-url" href="#" target="_blank" class="text-xs text-med-muted hover:text-cyan-accent font-mono truncate block max-w-xl">
+                        https://...
+                    </a>
+                </div>
+
+                <!-- Resumen Conceptual -->
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-med-border/60 space-y-2">
+                    <div class="text-xs font-mono text-cyan-accent font-semibold uppercase tracking-wider">
+                        📌 Resumen Conceptual y Propósito
+                    </div>
+                    <p id="res-doc-summary" class="text-sm text-slate-300 leading-relaxed">
+                        ...
+                    </p>
+                    <div id="res-tags-list" class="flex flex-wrap gap-1.5 pt-1"></div>
+                </div>
+
+                <!-- SECCIÓN DE CASOS DE USO Y SCRIPTS MINIMALISTAS -->
+                <div class="space-y-4 pt-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                            <span>🚀 Casos de Uso y Scripts Minimalistas</span>
+                        </h3>
+                        <span class="text-xs text-slate-400 font-mono">Python 3.10+</span>
+                    </div>
+
+                    <!-- Contenedor dinámico de los 3 Casos -->
+                    <div id="cases-container" class="space-y-5">
+                        <!-- Se llena dinámicamente con Caso 1, Caso 2, Caso 3 -->
+                    </div>
+                </div>
+
+                <!-- Gotchas y Buenas Prácticas -->
+                <div id="practices-container" class="pt-4 border-t border-med-border/60 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <!-- Se llena dinámicamente -->
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer Simple -->
+    <footer class="border-t border-med-border/50 py-4 text-center text-xs font-mono text-slate-500">
+        Fábrica de Software Autónoma • Estándar OKF v1.0.0 • Obsidian Knowledge Graph vía MCP
+    </footer>
+
+    <!-- JAVASCRIPT SIMPLE Y MODULAR -->
+    <script>
+        let selectedFile = null;
+
+        function setPreset(url) {
+            document.getElementById('input-urls').value = url;
+            clearFile();
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                document.getElementById('file-label').innerText = `Archivo: ${file.name}`;
+                document.getElementById('clear-file-btn').classList.remove('hidden');
+                document.getElementById('input-urls').value = '';
+            }
+        }
+
+        function clearFile() {
+            selectedFile = null;
+            document.getElementById('input-file').value = '';
+            document.getElementById('file-label').innerText = "O subir archivo .txt con enlaces";
+            document.getElementById('clear-file-btn').classList.add('hidden');
+        }
+
+        function backToForm() {
+            document.getElementById('view-result').classList.add('hidden');
+            document.getElementById('view-loading').classList.add('hidden');
+            document.getElementById('view-form').classList.remove('hidden');
+        }
+
+        function copySnippet(btn, codeText) {
+            navigator.clipboard.writeText(codeText).then(() => {
+                const original = btn.innerHTML;
+                btn.innerHTML = `✓ Copiado`;
+                btn.classList.add('bg-cyan-accent', 'text-cyan-dark');
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.remove('bg-cyan-accent', 'text-cyan-dark');
+                }, 1800);
+            });
+        }
+
+        async function processCreation() {
+            const text = document.getElementById('input-urls').value.trim();
+
+            if (!selectedFile && !text) {
+                alert('Por favor ingresa un enlace, lista de enlaces o sube un archivo .txt');
+                return;
+            }
+
+            // Mostrar pantalla de carga
+            document.getElementById('view-form').classList.add('hidden');
+            document.getElementById('view-result').classList.add('hidden');
+            document.getElementById('view-loading').classList.remove('hidden');
+
+            try {
+                let res, data;
+
+                if (selectedFile) {
+                    const formData = new FormData();
+                    formData.append('file', selectedFile);
+                    res = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    res = await fetch('/api/process', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ input_text: text })
+                    });
+                }
+
+                data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Error procesando la solicitud');
+
+                // Renderizar la página creada con el nombre, casos y scripts
+                renderCreatedPage(data);
+
+            } catch (err) {
+                alert(`Error: ${err.message}`);
+                backToForm();
+            }
+        }
+
+        function renderCreatedPage(response) {
+            document.getElementById('view-loading').classList.add('hidden');
+            document.getElementById('view-result').classList.remove('hidden');
+
+            // Si es respuesta única o múltiple
+            const item = response.mode === 'single' ? response.data : (response.data[0] || response.data);
+
+            // 1. Nombre de la Documentación
+            document.getElementById('res-doc-title').innerText = item.title || 'Documentación Técnica';
+            document.getElementById('res-node-id').innerText = item.mcp_node_id || 'CU-OKF';
+            document.getElementById('res-complexity').innerText = item.complexity || 'intermediate';
+            
+            const srcLink = document.getElementById('res-source-url');
+            srcLink.innerText = item.url || '#';
+            srcLink.href = item.url || '#';
+
+            document.getElementById('res-doc-summary').innerText = item.semantic_summary || 'Resumen procesado.';
+
+            // Enlaces de descarga y vista web
+            if (item.web_page_url) {
+                document.getElementById('res-html-btn').href = item.web_page_url;
+                document.getElementById('res-html-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('res-html-btn').classList.add('hidden');
+            }
+
+            if (item.filename) {
+                document.getElementById('res-md-btn').href = `/cases/${item.filename}`;
+            }
+
+            // Tags
+            const tagsCont = document.getElementById('res-tags-list');
+            tagsCont.innerHTML = '';
+            (item.tags || []).forEach(t => {
+                const tag = document.createElement('span');
+                tag.className = "text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700";
+                tag.innerText = `#${t}`;
+                tagsCont.appendChild(tag);
+            });
+
+            // 2. Casos de Uso y Scripts Minimalistas
+            const casesCont = document.getElementById('cases-container');
+            casesCont.innerHTML = '';
+
+            (item.cases || []).forEach(c => {
+                const caseCard = document.createElement('div');
+                caseCard.className = "p-5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-3";
+                
+                const safeCode = (c.code || '').trim();
+
+                caseCard.innerHTML = `
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="text-[11px] font-mono font-bold text-cyan-accent uppercase tracking-wider">
+                                Caso ${c.case_number || 1}
+                            </div>
+                            <h4 class="text-base font-bold text-white tracking-tight">${c.title || 'Caso de Uso'}</h4>
+                            <p class="text-xs text-slate-400 mt-1">${c.scenario || ''}</p>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <pre class="p-4 rounded-lg bg-slate-900 text-cyan-accent font-mono text-xs overflow-x-auto border border-slate-800 leading-relaxed">${escapeHtml(safeCode)}</pre>
+                        <button onclick="copySnippet(this, \`${escapeJsString(safeCode)}\`)" 
+                            class="absolute top-2 right-2 text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 transition flex items-center gap-1">
+                            📋 Copiar
+                        </button>
+                    </div>
+                `;
+                casesCont.appendChild(caseCard);
+            });
+
+            // 3. Buenas prácticas y Gotchas
+            const practCont = document.getElementById('practices-container');
+            const practices = (item.best_practices || []).map(p => `<li>• ${p}</li>`).join('');
+            const pitfalls = (item.common_pitfalls || []).map(p => `<li>• ${p}</li>`).join('');
+
+            practCont.innerHTML = `
+                <div class="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 space-y-1">
+                    <span class="text-emerald-400 font-mono font-semibold">Buenas Prácticas:</span>
+                    <ul class="text-slate-300 space-y-0.5 text-[11px]">${practices || '<li>• Mantener scripts minimalistas y desacoplados.</li>'}</ul>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 space-y-1">
+                    <span class="text-amber-400 font-mono font-semibold">Consideraciones / Gotchas:</span>
+                    <ul class="text-slate-300 space-y-0.5 text-[11px]">${pitfalls || '<li>• Validar compatibilidad de dependencias.</li>'}</ul>
+                </div>
+            `;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function escapeJsString(str) {
+            return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+        }
+    </script>
+</body>
+</html>

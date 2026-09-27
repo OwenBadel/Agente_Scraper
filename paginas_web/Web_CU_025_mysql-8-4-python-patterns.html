@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectividad y Patrones de Resiliencia con MySQL 8.4 — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Conectividad y Patrones de Resiliencia con MySQL 8.4</h1>
+            <p>Documentación analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>mysql-connector-python>=8.4.0 sqlalchemy>=2.0.0 aiomysql>=0.2.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#mysql</span><span class="tag">#database</span><span class="tag">#backend</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMjUtTVlTUUwtOC00LVBZVEhPTi1QQVRURVJOUwp0aXRsZTogQ29uZWN0aXZpZGFkIHkgUGF0cm9uZXMgZGUgUmVzaWxpZW5jaWEgY29uIE15U1FMIDguNAp0eXBlOiB1c2UtY2FzZQp2ZXJzaW9uOiAxLjAuMApzdGF0dXM6IGFjdGl2ZQpjcmVhdGVkX2F0OiAnMjAyNi0wOC0yOVQyMDoxNTozOC4zNTc0MjYtMDU6MDAnCnVwZGF0ZWRfYXQ6ICcyMDI2LTA4LTI5VDIwOjE1OjM4LjM1NzQyNi0wNTowMCcKc291cmNlX3VybDogaHR0cHM6Ly9kZXYubXlzcWwuY29tL2RvYy9yZWZtYW4vOC40L2VuLwp0YWdzOgotIHB5dGhvbgotIG15c3FsCi0gZGF0YWJhc2UKLSBiYWNrZW5kCi0gY2Fzby1kZS11c28Kc2tpbGxzX3JlcXVpcmVkOgotIDAxX1NraWxscy9TS0lMTC0wMDEtU0NSQVBJTkctRVhUUkFDQ0lPTi1XRUIKZGVwZW5kZW5jaWVzOgotIG15c3FsLWNvbm5lY3Rvci1weXRob24+PTguNC4wCi0gc3FsYWxjaGVteT49Mi4wLjAKLSBhaW9teXNxbD49MC4yLjAKY29tcGxleGl0eTogaW50ZXJtZWRpYXRlCnNlbWFudGljX3N1bW1hcnk6IE15U1FMIDguNCBMVFMgaW50cm9kdWNlIG1lam9yYXMgc2lnbmlmaWNhdGl2YXMgZW4gbGEgZ2VzdGnDs24gZGUKICBjb25leGlvbmVzIHkgc2VndXJpZGFkLiBFc3RlIGFuw6FsaXNpcyBzZSBjZW50cmEgZW4gbGEgaW1wbGVtZW50YWNpw7NuIGRlIGNsaWVudGVzCiAgcm9idXN0b3MgZW4gUHl0aG9uLCBjdWJyaWVuZG8gZGVzZGUgZWwgdXNvIGRlbCBkcml2ZXIgb2ZpY2lhbCBoYXN0YSBsYSBpbnRlZ3JhY2nDs24KICBjb24gT1JNcyBtb2Rlcm5vcyB5IGZsdWpvcyBhc8OtbmNyb25vcyBwYXJhIGFsdGEgZGlzcG9uaWJpbGlkYWQuCi0tLQoKIyDwn5KhIENvbmVjdGl2aWRhZCB5IFBhdHJvbmVzIGRlIFJlc2lsaWVuY2lhIGNvbiBNeVNRTCA4LjQKCj4gKipPcmlnZW46KiogW2h0dHBzOi8vZGV2Lm15c3FsLmNvbS9kb2MvcmVmbWFuLzguNC9lbi9dKGh0dHBzOi8vZGV2Lm15c3FsLmNvbS9kb2MvcmVmbWFuLzguNC9lbi8pICAKPiAqKkNvbXBsZWppZGFkOioqIGBpbnRlcm1lZGlhdGVgIHwgKipFc3TDoW5kYXI6KiogYE9LRiB2MS4wLjBgCgotLS0KCiMjIPCfk4wgUmVzdW1lbiBDb25jZXB0dWFsIHkgUHJvcMOzc2l0bwpNeVNRTCA4LjQgTFRTIGludHJvZHVjZSBtZWpvcmFzIHNpZ25pZmljYXRpdmFzIGVuIGxhIGdlc3Rpw7NuIGRlIGNvbmV4aW9uZXMgeSBzZWd1cmlkYWQuIEVzdGUgYW7DoWxpc2lzIHNlIGNlbnRyYSBlbiBsYSBpbXBsZW1lbnRhY2nDs24gZGUgY2xpZW50ZXMgcm9idXN0b3MgZW4gUHl0aG9uLCBjdWJyaWVuZG8gZGVzZGUgZWwgdXNvIGRlbCBkcml2ZXIgb2ZpY2lhbCBoYXN0YSBsYSBpbnRlZ3JhY2nDs24gY29uIE9STXMgbW9kZXJub3MgeSBmbHVqb3MgYXPDrW5jcm9ub3MgcGFyYSBhbHRhIGRpc3BvbmliaWxpZGFkLgoKYGBgbWVybWFpZApncmFwaCBMUgogICAgSW5wdXRbIkVudHJhZGEgLyBDb25maWd1cmFjacOzbiJdIC0tPiBMb2dpY1siTMOzZ2ljYSBkZSBteXNxbC04LTQtcHl0aG9uLXBhdHRlcm5zIl0KICAgIExvZ2ljIC0tPiBPdXRwdXRbIlJlc3VsdGFkbyBWYWxpZGFkbyJdCmBgYAoKLS0tCgojIyDwn5ug77iPIFJlcXVpc2l0b3MgZGUgSW5zdGFsYWNpw7NuCmBgYGJhc2gKcGlwIGluc3RhbGwgbXlzcWwtY29ubmVjdG9yLXB5dGhvbj49OC40LjAgc3FsYWxjaGVteT49Mi4wLjAgYWlvbXlzcWw+PTAuMi4wCmBgYAoKLS0tCgojIyDwn5qAIENhc29zIGRlIFVzbyB5IFNjcmlwdHMgTWluaW1hbGlzdGFzCgojIyMgQ2FzbyAxOiBJbXBsZW1lbnRhY2nDs24gZGUgQ2xpZW50ZSBTw61uY3Jvbm8gQmFzZQoqICoqRXNjZW5hcmlvOioqIEVzdGFibGVjaW1pZW50byBkZSB1bmEgY29uZXhpw7NuIHNlZ3VyYSB5IGVqZWN1Y2nDs24gZGUgY29uc3VsdGFzIHBhcmFtZXRyaXphZGFzIHV0aWxpemFuZG8gZWwgZHJpdmVyIG9maWNpYWwgZGUgTXlTUUwuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IG15c3FsLmNvbm5lY3Rvcgpmcm9tIG15c3FsLmNvbm5lY3RvciBpbXBvcnQgRXJyb3IKZnJvbSB0eXBpbmcgaW1wb3J0IERpY3QsIEFueQoKZGVmIGV4ZWN1dGVfYmFzaWNfcXVlcnkoY29uZmlnOiBEaWN0W3N0ciwgQW55XSkgLT4gTm9uZToKICAgIHRyeToKICAgICAgICB3aXRoIG15c3FsLmNvbm5lY3Rvci5jb25uZWN0KCoqY29uZmlnKSBhcyBjb25uZWN0aW9uOgogICAgICAgICAgICBpZiBjb25uZWN0aW9uLmlzX2Nvbm5lY3RlZCgpOgogICAgICAgICAgICAgICAgd2l0aCBjb25uZWN0aW9uLmN1cnNvcihkaWN0aW9uYXJ5PVRydWUpIGFzIGN1cnNvcjoKICAgICAgICAgICAgICAgICAgICBjdXJzb3IuZXhlY3V0ZSgnU0VMRUNUIFZFUlNJT04oKSBBUyB2ZXJzaW9uJykKICAgICAgICAgICAgICAgICAgICByZXN1bHQgPSBjdXJzb3IuZmV0Y2hvbmUoKQogICAgICAgICAgICAgICAgICAgIHByaW50KGYnTXlTUUwgVmVyc2lvbjoge3Jlc3VsdFsidmVyc2lvbiJdfScpCiAgICBleGNlcHQgRXJyb3IgYXMgZToKICAgICAgICBwcmludChmJ0RhdGFiYXNlIEVycm9yOiB7ZX0nKQoKaWYgX19uYW1lX18gPT0gJ19fbWFpbl9fJzoKICAgIGRiX2NvbmZpZyA9IHsnaG9zdCc6ICdsb2NhbGhvc3QnLCAndXNlcic6ICdyb290JywgJ3Bhc3N3b3JkJzogJ3NlY3VyZV9wYXNzd29yZCcsICdkYXRhYmFzZSc6ICdzeXMnfQogICAgZXhlY3V0ZV9iYXNpY19xdWVyeShkYl9jb25maWcpCmBgYAoKLS0tCgojIyMgQ2FzbyAyOiBQcm9jZXNhbWllbnRvIEFzw61uY3Jvbm8gY29uIE1hbmVqbyBkZSBFcnJvcmVzCiogKipFc2NlbmFyaW86KiogR2VzdGnDs24gZGUgbcO6bHRpcGxlcyBjb25zdWx0YXMgY29uY3VycmVudGVzIHV0aWxpemFuZG8gYWlvbXlzcWwgcGFyYSBldml0YXIgYmxvcXVlb3MgZW4gZWwgZXZlbnQgbG9vcCBkZSBhcGxpY2FjaW9uZXMgZGUgYWx0byB0csOhZmljby4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgYXN5bmNpbwppbXBvcnQgYWlvbXlzcWwKCmFzeW5jIGRlZiBmZXRjaF9kYl9zdGF0dXMoaG9zdDogc3RyLCB1c2VyOiBzdHIsIHBhc3N3b3JkOiBzdHIpIC0+IE5vbmU6CiAgICB0cnk6CiAgICAgICAgY29ubiA9IGF3YWl0IGFpb215c3FsLmNvbm5lY3QoaG9zdD1ob3N0LCBwb3J0PTMzMDYsIHVzZXI9dXNlciwgcGFzc3dvcmQ9cGFzc3dvcmQsIGRiPSdteXNxbCcpCiAgICAgICAgYXN5bmMgd2l0aCBjb25uLmN1cnNvcigpIGFzIGN1cjoKICAgICAgICAgICAgYXdhaXQgY3VyLmV4ZWN1dGUoJ1NIT1cgUFJPQ0VTU0xJU1QnKQogICAgICAgICAgICByZXN1bHQgPSBhd2FpdCBjdXIuZmV0Y2hhbGwoKQogICAgICAgICAgICBwcmludChmJ0FjdGl2ZSBwcm9jZXNzZXM6IHtsZW4ocmVzdWx0KX0nKQogICAgICAgIGNvbm4uY2xvc2UoKQogICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHByaW50KGYnQXN5bmMgQ29ubmVjdGlvbiBGYWlsZWQ6IHtlfScpCgppZiBfX25hbWVfXyA9PSAnX19tYWluX18nOgogICAgYXN5bmNpby5ydW4oZmV0Y2hfZGJfc3RhdHVzKCcxMjcuMC4wLjEnLCAncm9vdCcsICdwYXNzd29yZCcpKQpgYGAKCi0tLQoKIyMjIENhc28gMzogUGF0csOzbiBkZSBSZXBvc2l0b3JpbyBjb24gUG9vbCBkZSBDb25leGlvbmVzCiogKipFc2NlbmFyaW86KiogQXJxdWl0ZWN0dXJhIHJlc2lsaWVudGUgdXRpbGl6YW5kbyBTUUxBbGNoZW15IDIuMCBwYXJhIGdlc3Rpb25hciB1biBwb29sIGRlIGNvbmV4aW9uZXMgcGVyc2lzdGVudGUgeSB0cmFuc2FjY2lvbmVzIGF0w7NtaWNhcy4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgpmcm9tIHNxbGFsY2hlbXkgaW1wb3J0IGNyZWF0ZV9lbmdpbmUsIHRleHQKZnJvbSBzcWxhbGNoZW15Lm9ybSBpbXBvcnQgc2Vzc2lvbm1ha2VyCmZyb20gc3FsYWxjaGVteS5leGMgaW1wb3J0IFNRTEFsY2hlbXlFcnJvcgoKY2xhc3MgRGF0YWJhc2VNYW5hZ2VyOgogICAgZGVmIF9faW5pdF9fKHNlbGYsIHVyaTogc3RyKToKICAgICAgICBzZWxmLmVuZ2luZSA9IGNyZWF0ZV9lbmdpbmUodXJpLCBwb29sX3NpemU9MTAsIG1heF9vdmVyZmxvdz0yMCwgcG9vbF9wcmVfcGluZz1UcnVlKQogICAgICAgIHNlbGYuU2Vzc2lvbkxvY2FsID0gc2Vzc2lvbm1ha2VyKGJpbmQ9c2VsZi5lbmdpbmUpCgogICAgZGVmIHNhZmVfZXhlY3V0ZShzZWxmLCBxdWVyeTogc3RyLCBwYXJhbXM6IGRpY3QgPSBOb25lKSAtPiBOb25lOgogICAgICAgIHNlc3Npb24gPSBzZWxmLlNlc3Npb25Mb2NhbCgpCiAgICAgICAgdHJ5OgogICAgICAgICAgICBzZXNzaW9uLmV4ZWN1dGUodGV4dChxdWVyeSksIHBhcmFtcyBvciB7fSkKICAgICAgICAgICAgc2Vzc2lvbi5jb21taXQoKQogICAgICAgIGV4Y2VwdCBTUUxBbGNoZW15RXJyb3IgYXMgZToKICAgICAgICAgICAgc2Vzc2lvbi5yb2xsYmFjaygpCiAgICAgICAgICAgIHByaW50KGYnVHJhbnNhY3Rpb24gZmFpbGVkLCByb2xsZWQgYmFjazoge2V9JykKICAgICAgICBmaW5hbGx5OgogICAgICAgICAgICBzZXNzaW9uLmNsb3NlKCkKCmlmIF9fbmFtZV9fID09ICdfX21haW5fXyc6CiAgICBkYiA9IERhdGFiYXNlTWFuYWdlcignbXlzcWwrbXlzcWxjb25uZWN0b3I6Ly9yb290OnBhc3N3b3JkQGxvY2FsaG9zdC90ZXN0X2RiJykKICAgIGRiLnNhZmVfZXhlY3V0ZSgnSU5TRVJUIElOVE8gbG9ncyAoZXZlbnQpIFZBTFVFUyAoOmV2ZW50KScsIHsnZXZlbnQnOiAnc3lzdGVtX3N0YXJ0J30pCmBgYAoKLS0tCgoKIyMg4pqg77iPIENvbnNpZGVyYWNpb25lcyBUw6ljbmljYXMgeSBHb3RjaGFzCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBVdGlsaXphciBzaWVtcHJlIGNvbnN1bHRhcyBwYXJhbWV0cml6YWRhcyBwYXJhIHByZXZlbmlyIGlueWVjY2nDs24gU1FMLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogSW1wbGVtZW50YXIgJ3Bvb2xfcHJlX3BpbmcnIGVuIGVudG9ybm9zIGRlIHByb2R1Y2Npw7NuIHBhcmEgZGV0ZWN0YXIgY29uZXhpb25lcyBtdWVydGFzLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogQ29uZmlndXJhciB0aW1lb3V0cyBkZSBsZWN0dXJhIHkgZXNjcml0dXJhIHBhcmEgZXZpdGFyIHByb2Nlc29zIHpvbWJpZXMuCiogKipHb3RjaGEvQWxlcnRhOioqIE5vIGNlcnJhciBleHBsw61jaXRhbWVudGUgbG9zIGN1cnNvcmVzIG8gY29uZXhpb25lcyBlbiBzY3JpcHRzIGRlIGxhcmdhIGR1cmFjacOzbi4KKiAqKkdvdGNoYS9BbGVydGE6KiogSWdub3JhciBlbCBsw61taXRlIGRlIGNvbmV4aW9uZXMgc2ltdWx0w6FuZWFzIGNvbmZpZ3VyYWRvIGVuIGVsIHNlcnZpZG9yIE15U1FMIChtYXhfY29ubmVjdGlvbnMpLgoqICoqR290Y2hhL0FsZXJ0YToqKiBNZXpjbGFyIGzDs2dpY2Egc8OtbmNyb25hIHkgYXPDrW5jcm9uYSBzaW4gZWwgdXNvIGRlIHRocmVhZCBwb29scyBhZGVjdWFkb3MuCgotLS0KCiMjIPCflJcgTm9kb3MgUmVsYWNpb25hZG9zIGVuIGVsIEdyYWZvCiogW1swMV9Ta2lsbHMvU0tJTExfMDAxX1NjcmFwaW5nX3lfRXh0cmFjY2lvbl9XZWJ8SGFiaWxpZGFkIFTDqWNuaWNhOiBTY3JhcGluZyB5IEV4dHJhY2Npw7NuIFdlYl1dCiogW1swM19Qcm95ZWN0b3MvUFJPSl8wMDFfQWdlbnRlX1NjcmFwZXJ8UHJveWVjdG86IEFnZW50ZSBTY3JhcGVyXV0K" download="CU_025_mysql-8-4-python-patterns.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>MySQL 8.4 LTS introduce mejoras significativas en la gestión de conexiones y seguridad. Este análisis se centra en la implementación de clientes robustos en Python, cubriendo desde el uso del driver oficial hasta la integración con ORMs modernos y flujos asíncronos para alta disponibilidad.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Implementación de Cliente Síncrono Base</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Establecimiento de una conexión segura y ejecución de consultas parametrizadas utilizando el driver oficial de MySQL.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import mysql.connector
+from mysql.connector import Error
+from typing import Dict, Any
+
+def execute_basic_query(config: Dict[str, Any]) -&gt; None:
+    try:
+        with mysql.connector.connect(**config) as connection:
+            if connection.is_connected():
+                with connection.cursor(dictionary=True) as cursor:
+                    cursor.execute('SELECT VERSION() AS version')
+                    result = cursor.fetchone()
+                    print(f'MySQL Version: {result["version"]}')
+    except Error as e:
+        print(f'Database Error: {e}')
+
+if __name__ == '__main__':
+    db_config = {'host': 'localhost', 'user': 'root', 'password': 'secure_password', 'database': 'sys'}
+    execute_basic_query(db_config)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Procesamiento Asíncrono con Manejo de Errores</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Gestión de múltiples consultas concurrentes utilizando aiomysql para evitar bloqueos en el event loop de aplicaciones de alto tráfico.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import asyncio
+import aiomysql
+
+async def fetch_db_status(host: str, user: str, password: str) -&gt; None:
+    try:
+        conn = await aiomysql.connect(host=host, port=3306, user=user, password=password, db='mysql')
+        async with conn.cursor() as cur:
+            await cur.execute('SHOW PROCESSLIST')
+            result = await cur.fetchall()
+            print(f'Active processes: {len(result)}')
+        conn.close()
+    except Exception as e:
+        print(f'Async Connection Failed: {e}')
+
+if __name__ == '__main__':
+    asyncio.run(fetch_db_status('127.0.0.1', 'root', 'password'))</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Repositorio con Pool de Conexiones</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Arquitectura resiliente utilizando SQLAlchemy 2.0 para gestionar un pool de conexiones persistente y transacciones atómicas.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
+
+class DatabaseManager:
+    def __init__(self, uri: str):
+        self.engine = create_engine(uri, pool_size=10, max_overflow=20, pool_pre_ping=True)
+        self.SessionLocal = sessionmaker(bind=self.engine)
+
+    def safe_execute(self, query: str, params: dict = None) -&gt; None:
+        session = self.SessionLocal()
+        try:
+            session.execute(text(query), params or {})
+            session.commit()
+        except SQLAlchemyError as e:
+            session.rollback()
+            print(f'Transaction failed, rolled back: {e}')
+        finally:
+            session.close()
+
+if __name__ == '__main__':
+    db = DatabaseManager('mysql+mysqlconnector://root:password@localhost/test_db')
+    db.safe_execute('INSERT INTO logs (event) VALUES (:event)', {'event': 'system_start'})</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar siempre consultas parametrizadas para prevenir inyección SQL.</li><li>✅ <strong>Práctica:</strong> Implementar 'pool_pre_ping' en entornos de producción para detectar conexiones muertas.</li><li>✅ <strong>Práctica:</strong> Configurar timeouts de lectura y escritura para evitar procesos zombies.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> No cerrar explícitamente los cursores o conexiones en scripts de larga duración.</li><li>⚠️ <strong>Alerta:</strong> Ignorar el límite de conexiones simultáneas configurado en el servidor MySQL (max_connections).</li><li>⚠️ <strong>Alerta:</strong> Mezclar lógica síncrona y asíncrona sin el uso de thread pools adecuados.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

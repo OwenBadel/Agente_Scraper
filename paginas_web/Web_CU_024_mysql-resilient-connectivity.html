@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resiliencia y Conectividad Robusta con MySQL — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Resiliencia y Conectividad Robusta con MySQL</h1>
+            <p>Documentación analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>mysql-connector-python>=8.0.33</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#mysql-connector-python</span><span class="tag">#database-reliability</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMjQtTVlTUUwtUkVTSUxJRU5ULUNPTk5FQ1RJVklUWQp0aXRsZTogUmVzaWxpZW5jaWEgeSBDb25lY3RpdmlkYWQgUm9idXN0YSBjb24gTXlTUUwKdHlwZTogdXNlLWNhc2UKdmVyc2lvbjogMS4wLjAKc3RhdHVzOiBhY3RpdmUKY3JlYXRlZF9hdDogJzIwMjYtMDgtMjlUMjA6MTU6MzcuNzE3NDQ2LTA1OjAwJwp1cGRhdGVkX2F0OiAnMjAyNi0wOC0yOVQyMDoxNTozNy43MTc0NDYtMDU6MDAnCnNvdXJjZV91cmw6IGh0dHBzOi8vZGV2Lm15c3FsLmNvbS9kb2MvCnRhZ3M6Ci0gcHl0aG9uCi0gbXlzcWwtY29ubmVjdG9yLXB5dGhvbgotIGRhdGFiYXNlLXJlbGlhYmlsaXR5Ci0gY2Fzby1kZS11c28Kc2tpbGxzX3JlcXVpcmVkOgotIDAxX1NraWxscy9TS0lMTC0wMDEtU0NSQVBJTkctRVhUUkFDQ0lPTi1XRUIKZGVwZW5kZW5jaWVzOgotIG15c3FsLWNvbm5lY3Rvci1weXRob24+PTguMC4zMwpjb21wbGV4aXR5OiBpbnRlcm1lZGlhdGUKc2VtYW50aWNfc3VtbWFyeTogSW1wbGVtZW50YWNpw7NuIGRlIHBhdHJvbmVzIGRlIGNvbmV4acOzbiB5IG1vbml0b3JlbyBwYXJhIGJhc2VzIGRlCiAgZGF0b3MgTXlTUUwsIGVuZm9jYWRvcyBlbiBsYSBhbHRhIGRpc3BvbmliaWxpZGFkIHkgcmVjdXBlcmFjacOzbiBhbnRlIGZhbGxvcyBkZSBpbmZyYWVzdHJ1Y3R1cmEuCiAgRXN0YSBndcOtYSBhYm9yZGEgZGVzZGUgbGEgdmFsaWRhY2nDs24gYsOhc2ljYSBkZSBlc3RhZG8gaGFzdGEgbGEgaW1wbGVtZW50YWNpw7NuIGRlCiAgcG9vbHMgZGUgY29uZXhpb25lcyBjb24gbMOzZ2ljYSBkZSByZWludGVudG8gYW50ZSBpbmNpZGVudGVzIHTDqWNuaWNvcy4KLS0tCgojIPCfkqEgUmVzaWxpZW5jaWEgeSBDb25lY3RpdmlkYWQgUm9idXN0YSBjb24gTXlTUUwKCj4gKipPcmlnZW46KiogW2h0dHBzOi8vZGV2Lm15c3FsLmNvbS9kb2MvXShodHRwczovL2Rldi5teXNxbC5jb20vZG9jLykgIAo+ICoqQ29tcGxlamlkYWQ6KiogYGludGVybWVkaWF0ZWAgfCAqKkVzdMOhbmRhcjoqKiBgT0tGIHYxLjAuMGAKCi0tLQoKIyMg8J+TjCBSZXN1bWVuIENvbmNlcHR1YWwgeSBQcm9ww7NzaXRvCkltcGxlbWVudGFjacOzbiBkZSBwYXRyb25lcyBkZSBjb25leGnDs24geSBtb25pdG9yZW8gcGFyYSBiYXNlcyBkZSBkYXRvcyBNeVNRTCwgZW5mb2NhZG9zIGVuIGxhIGFsdGEgZGlzcG9uaWJpbGlkYWQgeSByZWN1cGVyYWNpw7NuIGFudGUgZmFsbG9zIGRlIGluZnJhZXN0cnVjdHVyYS4gRXN0YSBndcOtYSBhYm9yZGEgZGVzZGUgbGEgdmFsaWRhY2nDs24gYsOhc2ljYSBkZSBlc3RhZG8gaGFzdGEgbGEgaW1wbGVtZW50YWNpw7NuIGRlIHBvb2xzIGRlIGNvbmV4aW9uZXMgY29uIGzDs2dpY2EgZGUgcmVpbnRlbnRvIGFudGUgaW5jaWRlbnRlcyB0w6ljbmljb3MuCgpgYGBtZXJtYWlkCmdyYXBoIExSCiAgICBJbnB1dFsiRW50cmFkYSAvIENvbmZpZ3VyYWNpw7NuIl0gLS0+IExvZ2ljWyJMw7NnaWNhIGRlIG15c3FsLXJlc2lsaWVudC1jb25uZWN0aXZpdHkiXQogICAgTG9naWMgLS0+IE91dHB1dFsiUmVzdWx0YWRvIFZhbGlkYWRvIl0KYGBgCgotLS0KCiMjIPCfm6DvuI8gUmVxdWlzaXRvcyBkZSBJbnN0YWxhY2nDs24KYGBgYmFzaApwaXAgaW5zdGFsbCBteXNxbC1jb25uZWN0b3ItcHl0aG9uPj04LjAuMzMKYGBgCgotLS0KCiMjIPCfmoAgQ2Fzb3MgZGUgVXNvIHkgU2NyaXB0cyBNaW5pbWFsaXN0YXMKCiMjIyBDYXNvIDE6IFZlcmlmaWNhY2nDs24gZGUgRXN0YWRvIHkgQ29uZXhpw7NuIELDoXNpY2EKKiAqKkVzY2VuYXJpbzoqKiBWYWxpZGFyIGxhIGRpc3BvbmliaWxpZGFkIGRlbCBzZXJ2aWRvciBNeVNRTCBhbnRlcyBkZSByZWFsaXphciBvcGVyYWNpb25lcyBjcsOtdGljYXMuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IG15c3FsLmNvbm5lY3Rvcgpmcm9tIG15c3FsLmNvbm5lY3RvciBpbXBvcnQgRXJyb3IKCmRlZiBjaGVja19kYl9oZWFsdGgoY29uZmlnOiBkaWN0KSAtPiBib29sOgogICAgdHJ5OgogICAgICAgIGNvbm4gPSBteXNxbC5jb25uZWN0b3IuY29ubmVjdCgqKmNvbmZpZykKICAgICAgICBpZiBjb25uLmlzX2Nvbm5lY3RlZCgpOgogICAgICAgICAgICBwcmludCgiQ29uZXhpw7NuIGV4aXRvc2EgYWwgc2Vydmlkb3IgTXlTUUwiKQogICAgICAgICAgICBjb25uLmNsb3NlKCkKICAgICAgICAgICAgcmV0dXJuIFRydWUKICAgIGV4Y2VwdCBFcnJvciBhcyBlOgogICAgICAgIHByaW50KGYiRXJyb3IgZGUgY29uZXhpw7NuOiB7ZX0iKQogICAgcmV0dXJuIEZhbHNlCgpjb25maWcgPSB7Imhvc3QiOiAibG9jYWxob3N0IiwgInVzZXIiOiAicm9vdCIsICJwYXNzd29yZCI6ICJwYXNzIn0KY2hlY2tfZGJfaGVhbHRoKGNvbmZpZykKYGBgCgotLS0KCiMjIyBDYXNvIDI6IEdlc3Rpw7NuIGRlIEVycm9yZXMgeSBSZWludGVudG9zIEFzw61uY3Jvbm9zCiogKipFc2NlbmFyaW86KiogTWFuZWpvIGRlIGV4Y2VwY2lvbmVzIGVzcGVjw61maWNhcyBkZSByZWQgeSB0aWVtcG9zIGRlIGVzcGVyYSBhZ290YWRvcyAodGltZW91dHMpIGR1cmFudGUgbGEgY29uZXhpw7NuLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmltcG9ydCBteXNxbC5jb25uZWN0b3IKaW1wb3J0IHRpbWUKZnJvbSBteXNxbC5jb25uZWN0b3IgaW1wb3J0IGVycm9yY29kZQoKZGVmIGNvbm5lY3Rfd2l0aF9yZXRyeShjb25maWc6IGRpY3QsIHJldHJpZXM6IGludCA9IDMpOgogICAgZm9yIGkgaW4gcmFuZ2UocmV0cmllcyk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICByZXR1cm4gbXlzcWwuY29ubmVjdG9yLmNvbm5lY3QoKipjb25maWcpCiAgICAgICAgZXhjZXB0IG15c3FsLmNvbm5lY3Rvci5FcnJvciBhcyBlcnI6CiAgICAgICAgICAgIGlmIGVyci5lcnJubyA9PSBlcnJvcmNvZGUuQ1JfQ09OTl9IT1NUX0VSUk9SOgogICAgICAgICAgICAgICAgcHJpbnQoZiJJbnRlbnRvIHtpKzF9OiBTZXJ2aWRvciBubyBkaXNwb25pYmxlLiBSZWludGVudGFuZG8uLi4iKQogICAgICAgICAgICAgICAgdGltZS5zbGVlcCgyKQogICAgICAgICAgICBlbHNlOgogICAgICAgICAgICAgICAgcmFpc2UgZXJyCiAgICByYWlzZSBFeGNlcHRpb24oIk5vIHNlIHB1ZG8gZXN0YWJsZWNlciBjb25leGnDs24gdHJhcyB2YXJpb3MgaW50ZW50b3MuIikKYGBgCgotLS0KCiMjIyBDYXNvIDM6IFBhdHLDs24gZGUgUG9vbCBkZSBDb25leGlvbmVzIHBhcmEgUHJvZHVjY2nDs24KKiAqKkVzY2VuYXJpbzoqKiBJbXBsZW1lbnRhY2nDs24gZGUgdW4gcG9vbCBkZSBjb25leGlvbmVzIHBlcnNpc3RlbnRlIHBhcmEgb3B0aW1pemFyIHJlY3Vyc29zIHkgbWl0aWdhciBwaWNvcyBkZSBsYXRlbmNpYS4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgpmcm9tIG15c3FsLmNvbm5lY3RvciBpbXBvcnQgcG9vbGluZwoKZGJfY29uZmlnID0gewogICAgImRhdGFiYXNlIjogInRlc3RfZGIiLAogICAgInVzZXIiOiAiYWRtaW4iLAogICAgInBhc3N3b3JkIjogInNlY3JldCIsCiAgICAiaG9zdCI6ICIxMjcuMC4wLjEiCn0KCnRyeToKICAgIGNvbm5lY3Rpb25fcG9vbCA9IHBvb2xpbmcuTXlTUUxDb25uZWN0aW9uUG9vbCgKICAgICAgICBwb29sX25hbWU9Im15cG9vbCIsCiAgICAgICAgcG9vbF9zaXplPTUsCiAgICAgICAgKipkYl9jb25maWcKICAgICkKICAgIAogICAgY29ubiA9IGNvbm5lY3Rpb25fcG9vbC5nZXRfY29ubmVjdGlvbigpCiAgICBjdXJzb3IgPSBjb25uLmN1cnNvcihkaWN0aW9uYXJ5PVRydWUpCiAgICBjdXJzb3IuZXhlY3V0ZSgiU0VMRUNUIFZFUlNJT04oKSBhcyB2ZXJzaW9uIikKICAgIHByaW50KGYiVmVyc2nDs24gZGVsIHNlcnZpZG9yOiB7Y3Vyc29yLmZldGNob25lKClbJ3ZlcnNpb24nXX0iKQogICAgCiAgICBjdXJzb3IuY2xvc2UoKQogICAgY29ubi5jbG9zZSgpICAjIERldnVlbHZlIGxhIGNvbmV4acOzbiBhbCBwb29sCmV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgIHByaW50KGYiRmFsbG8gY3LDrXRpY28gZW4gZWwgcG9vbDoge2V9IikKYGBgCgotLS0KCgojIyDimqDvuI8gQ29uc2lkZXJhY2lvbmVzIFTDqWNuaWNhcyB5IEdvdGNoYXMKKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIFV0aWxpemFyIHNpZW1wcmUgdmFyaWFibGVzIGRlIGVudG9ybm8gcGFyYSBjcmVkZW5jaWFsZXMgc2Vuc2libGVzLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogSW1wbGVtZW50YXIgdGltZW91dHMgZXhwbMOtY2l0b3MgZW4gbGEgY29uZmlndXJhY2nDs24gZGUgY29uZXhpw7NuIHBhcmEgZXZpdGFyIGJsb3F1ZW9zIGluZmluaXRvcy4KKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIENlcnJhciBzaWVtcHJlIGxvcyBjdXJzb3JlcyB5IGNvbmV4aW9uZXMgKG8gdXNhciBjb250ZXh0IG1hbmFnZXJzKSBwYXJhIGV2aXRhciBmdWdhcyBkZSBtZW1vcmlhLgoqICoqR290Y2hhL0FsZXJ0YToqKiBObyBtYW5lamFyIGVsIGVycm9yIGRlICdMb3N0IGNvbm5lY3Rpb24gZHVyaW5nIHF1ZXJ5JyBlbiBwcm9jZXNvcyBkZSBsYXJnYSBkdXJhY2nDs24uCiogKipHb3RjaGEvQWxlcnRhOioqIEFicmlyIHVuYSBudWV2YSBjb25leGnDs24gcG9yIGNhZGEgcGV0aWNpw7NuIGVuIGx1Z2FyIGRlIHVzYXIgdW4gUG9vbCBlbiBlbnRvcm5vcyBkZSBhbHRvIHRyw6FmaWNvLgoKLS0tCgojIyDwn5SXIE5vZG9zIFJlbGFjaW9uYWRvcyBlbiBlbCBHcmFmbwoqIFtbMDFfU2tpbGxzL1NLSUxMXzAwMV9TY3JhcGluZ195X0V4dHJhY2Npb25fV2VifEhhYmlsaWRhZCBUw6ljbmljYTogU2NyYXBpbmcgeSBFeHRyYWNjacOzbiBXZWJdXQoqIFtbMDNfUHJveWVjdG9zL1BST0pfMDAxX0FnZW50ZV9TY3JhcGVyfFByb3llY3RvOiBBZ2VudGUgU2NyYXBlcl1dCg==" download="CU_024_mysql-resilient-connectivity.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>Implementación de patrones de conexión y monitoreo para bases de datos MySQL, enfocados en la alta disponibilidad y recuperación ante fallos de infraestructura. Esta guía aborda desde la validación básica de estado hasta la implementación de pools de conexiones con lógica de reintento ante incidentes técnicos.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Verificación de Estado y Conexión Básica</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Validar la disponibilidad del servidor MySQL antes de realizar operaciones críticas.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import mysql.connector
+from mysql.connector import Error
+
+def check_db_health(config: dict) -&gt; bool:
+    try:
+        conn = mysql.connector.connect(**config)
+        if conn.is_connected():
+            print("Conexión exitosa al servidor MySQL")
+            conn.close()
+            return True
+    except Error as e:
+        print(f"Error de conexión: {e}")
+    return False
+
+config = {"host": "localhost", "user": "root", "password": "pass"}
+check_db_health(config)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Gestión de Errores y Reintentos Asíncronos</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Manejo de excepciones específicas de red y tiempos de espera agotados (timeouts) durante la conexión.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import mysql.connector
+import time
+from mysql.connector import errorcode
+
+def connect_with_retry(config: dict, retries: int = 3):
+    for i in range(retries):
+        try:
+            return mysql.connector.connect(**config)
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.CR_CONN_HOST_ERROR:
+                print(f"Intento {i+1}: Servidor no disponible. Reintentando...")
+                time.sleep(2)
+            else:
+                raise err
+    raise Exception("No se pudo establecer conexión tras varios intentos.")</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Pool de Conexiones para Producción</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementación de un pool de conexiones persistente para optimizar recursos y mitigar picos de latencia.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from mysql.connector import pooling
+
+db_config = {
+    "database": "test_db",
+    "user": "admin",
+    "password": "secret",
+    "host": "127.0.0.1"
+}
+
+try:
+    connection_pool = pooling.MySQLConnectionPool(
+        pool_name="mypool",
+        pool_size=5,
+        **db_config
+    )
+    
+    conn = connection_pool.get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT VERSION() as version")
+    print(f"Versión del servidor: {cursor.fetchone()['version']}")
+    
+    cursor.close()
+    conn.close()  # Devuelve la conexión al pool
+except Exception as e:
+    print(f"Fallo crítico en el pool: {e}")</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar siempre variables de entorno para credenciales sensibles.</li><li>✅ <strong>Práctica:</strong> Implementar timeouts explícitos en la configuración de conexión para evitar bloqueos infinitos.</li><li>✅ <strong>Práctica:</strong> Cerrar siempre los cursores y conexiones (o usar context managers) para evitar fugas de memoria.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> No manejar el error de 'Lost connection during query' en procesos de larga duración.</li><li>⚠️ <strong>Alerta:</strong> Abrir una nueva conexión por cada petición en lugar de usar un Pool en entornos de alto tráfico.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

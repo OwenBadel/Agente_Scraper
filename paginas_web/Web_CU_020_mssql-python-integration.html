@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integración y Patrones de Acceso a Microsoft SQL Server — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Integración y Patrones de Acceso a Microsoft SQL Server</h1>
+            <p>Documentación analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>pyodbc>=5.0.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#mssql</span><span class="tag">#azure-sql</span><span class="tag">#database</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMjAtTVNTUUwtUFlUSE9OLUlOVEVHUkFUSU9OCnRpdGxlOiBJbnRlZ3JhY2nDs24geSBQYXRyb25lcyBkZSBBY2Nlc28gYSBNaWNyb3NvZnQgU1FMIFNlcnZlcgp0eXBlOiB1c2UtY2FzZQp2ZXJzaW9uOiAxLjAuMApzdGF0dXM6IGFjdGl2ZQpjcmVhdGVkX2F0OiAnMjAyNi0wOC0yOVQyMDoxNDoyNS4yNjgwMDctMDU6MDAnCnVwZGF0ZWRfYXQ6ICcyMDI2LTA4LTI5VDIwOjE0OjI1LjI2ODAwNy0wNTowMCcKc291cmNlX3VybDogaHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29tL2VuLXVzL3NxbC8/dmlldz1zcWwtc2VydmVyLXZlcjE3CnRhZ3M6Ci0gcHl0aG9uCi0gbXNzcWwKLSBhenVyZS1zcWwKLSBkYXRhYmFzZQotIGNhc28tZGUtdXNvCnNraWxsc19yZXF1aXJlZDoKLSAwMV9Ta2lsbHMvU0tJTEwtMDAxLVNDUkFQSU5HLUVYVFJBQ0NJT04tV0VCCmRlcGVuZGVuY2llczoKLSBweW9kYmM+PTUuMC4wCmNvbXBsZXhpdHk6IGludGVybWVkaWF0ZQpzZW1hbnRpY19zdW1tYXJ5OiBNaWNyb3NvZnQgU1FMIGVzIHVuIGVjb3Npc3RlbWEgZGUgYmFzZSBkZSBkYXRvcyByZWxhY2lvbmFsIHF1ZSBhYmFyY2EKICBkZXNkZSBpbnN0YW5jaWFzIGxvY2FsZXMgKFNRTCBTZXJ2ZXIpIGhhc3RhIHNvbHVjaW9uZXMgZW4gbGEgbnViZSAoQXp1cmUgU1FMIERhdGFiYXNlLAogIE1hbmFnZWQgSW5zdGFuY2UpLiBPZnJlY2UgY2FwYWNpZGFkZXMgZGUgcHJvY2VzYW1pZW50byB0cmFuc2FjY2lvbmFsIGRlIGFsdG8gcmVuZGltaWVudG8sCiAgaW50ZWdyYWNpw7NuIGNvbiBJQSB5IHNvcG9ydGUgbXVsdGktbW9kZWxvLiBQYXJhIGRlc2Fycm9sbGFkb3JlcyBQeXRob24sIGxhIGNvbmVjdGl2aWRhZAogIHNlIGVzdGFuZGFyaXphIG1lZGlhbnRlIGVsIGRyaXZlciBPREJDLCBwZXJtaXRpZW5kbyBvcGVyYWNpb25lcyBzZWd1cmFzIHkgZXNjYWxhYmxlcwogIGVuIGVudG9ybm9zIGVtcHJlc2FyaWFsZXMuCi0tLQoKIyDwn5KhIEludGVncmFjacOzbiB5IFBhdHJvbmVzIGRlIEFjY2VzbyBhIE1pY3Jvc29mdCBTUUwgU2VydmVyCgo+ICoqT3JpZ2VuOioqIFtodHRwczovL2xlYXJuLm1pY3Jvc29mdC5jb20vZW4tdXMvc3FsLz92aWV3PXNxbC1zZXJ2ZXItdmVyMTddKGh0dHBzOi8vbGVhcm4ubWljcm9zb2Z0LmNvbS9lbi11cy9zcWwvP3ZpZXc9c3FsLXNlcnZlci12ZXIxNykgIAo+ICoqQ29tcGxlamlkYWQ6KiogYGludGVybWVkaWF0ZWAgfCAqKkVzdMOhbmRhcjoqKiBgT0tGIHYxLjAuMGAKCi0tLQoKIyMg8J+TjCBSZXN1bWVuIENvbmNlcHR1YWwgeSBQcm9ww7NzaXRvCk1pY3Jvc29mdCBTUUwgZXMgdW4gZWNvc2lzdGVtYSBkZSBiYXNlIGRlIGRhdG9zIHJlbGFjaW9uYWwgcXVlIGFiYXJjYSBkZXNkZSBpbnN0YW5jaWFzIGxvY2FsZXMgKFNRTCBTZXJ2ZXIpIGhhc3RhIHNvbHVjaW9uZXMgZW4gbGEgbnViZSAoQXp1cmUgU1FMIERhdGFiYXNlLCBNYW5hZ2VkIEluc3RhbmNlKS4gT2ZyZWNlIGNhcGFjaWRhZGVzIGRlIHByb2Nlc2FtaWVudG8gdHJhbnNhY2Npb25hbCBkZSBhbHRvIHJlbmRpbWllbnRvLCBpbnRlZ3JhY2nDs24gY29uIElBIHkgc29wb3J0ZSBtdWx0aS1tb2RlbG8uIFBhcmEgZGVzYXJyb2xsYWRvcmVzIFB5dGhvbiwgbGEgY29uZWN0aXZpZGFkIHNlIGVzdGFuZGFyaXphIG1lZGlhbnRlIGVsIGRyaXZlciBPREJDLCBwZXJtaXRpZW5kbyBvcGVyYWNpb25lcyBzZWd1cmFzIHkgZXNjYWxhYmxlcyBlbiBlbnRvcm5vcyBlbXByZXNhcmlhbGVzLgoKYGBgbWVybWFpZApncmFwaCBMUgogICAgSW5wdXRbIkVudHJhZGEgLyBDb25maWd1cmFjacOzbiJdIC0tPiBMb2dpY1siTMOzZ2ljYSBkZSBtc3NxbC1weXRob24taW50ZWdyYXRpb24iXQogICAgTG9naWMgLS0+IE91dHB1dFsiUmVzdWx0YWRvIFZhbGlkYWRvIl0KYGBgCgotLS0KCiMjIPCfm6DvuI8gUmVxdWlzaXRvcyBkZSBJbnN0YWxhY2nDs24KYGBgYmFzaApwaXAgaW5zdGFsbCBweW9kYmM+PTUuMC4wCmBgYAoKLS0tCgojIyDwn5qAIENhc29zIGRlIFVzbyB5IFNjcmlwdHMgTWluaW1hbGlzdGFzCgojIyMgQ2FzbyAxOiBRdWlja3N0YXJ0OiBDb25leGnDs24geSBDb25zdWx0YSBCw6FzaWNhCiogKipFc2NlbmFyaW86KiogRXN0YWJsZWNlciB1bmEgY29uZXhpw7NuIHNlZ3VyYSBjb24gU1FMIFNlcnZlciBvIEF6dXJlIFNRTCB5IGVqZWN1dGFyIHVuYSBjb25zdWx0YSBULVNRTCBzaW1wbGUgdXRpbGl6YW5kbyBwYXLDoW1ldHJvcyBwYXJhIGV2aXRhciBpbnllY2Npb25lcy4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgcHlvZGJjCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0LCBUdXBsZQoKZGVmIGZldGNoX3NlcnZlcl92ZXJzaW9uKCkgLT4gc3RyOgogICAgY29ubl9zdHI6IHN0ciA9ICgKICAgICAgICAiRHJpdmVyPXtPREJDIERyaXZlciAxOCBmb3IgU1FMIFNlcnZlcn07IgogICAgICAgICJTZXJ2ZXI9dGNwOnlvdXItc2VydmVyLmRhdGFiYXNlLndpbmRvd3MubmV0LDE0MzM7IgogICAgICAgICJEYXRhYmFzZT15b3VyLWRiO1VpZD15b3VyLXVzZXI7UHdkPXlvdXItcGFzc3dvcmQ7IgogICAgICAgICJFbmNyeXB0PXllcztUcnVzdFNlcnZlckNlcnRpZmljYXRlPW5vO0Nvbm5lY3Rpb24gVGltZW91dD0zMDsiCiAgICApCiAgICAKICAgIHdpdGggcHlvZGJjLmNvbm5lY3QoY29ubl9zdHIpIGFzIGNvbm46CiAgICAgICAgd2l0aCBjb25uLmN1cnNvcigpIGFzIGN1cnNvcjoKICAgICAgICAgICAgY3Vyc29yLmV4ZWN1dGUoIlNFTEVDVCBAQFZFUlNJT04iKQogICAgICAgICAgICByb3c6IFR1cGxlID0gY3Vyc29yLmZldGNob25lKCkKICAgICAgICAgICAgcmV0dXJuIHN0cihyb3dbMF0pIGlmIHJvdyBlbHNlICJObyBkYXRhIgoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIHByaW50KGYiQ29ubmVjdGVkIHRvOiB7ZmV0Y2hfc2VydmVyX3ZlcnNpb24oKX0iKQpgYGAKCi0tLQoKIyMjIENhc28gMjogUHJvY2VzYW1pZW50byBwb3IgTG90ZXMgY29uIE1hbmVqbyBkZSBFcnJvcmVzCiogKipFc2NlbmFyaW86KiogSW5zZXJ0YXIgbcO6bHRpcGxlcyByZWdpc3Ryb3MgZGUgZm9ybWEgZWZpY2llbnRlIHV0aWxpemFuZG8gZmFzdF9leGVjdXRlbWFueSB5IGNhcHR1cmFuZG8gZXhjZXBjaW9uZXMgZXNwZWPDrWZpY2FzIGRlIGxhIGJhc2UgZGUgZGF0b3MuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IHB5b2RiYwpmcm9tIHR5cGluZyBpbXBvcnQgTGlzdCwgVHVwbGUKCmRlZiBidWxrX2luc2VydF9kYXRhKGRhdGE6IExpc3RbVHVwbGVbc3RyLCBpbnRdXSkgLT4gTm9uZToKICAgIGNvbm5fc3RyOiBzdHIgPSAiRHJpdmVyPXtPREJDIERyaXZlciAxOCBmb3IgU1FMIFNlcnZlcn07U2VydmVyPWxvY2FsaG9zdDtEYXRhYmFzZT1UZXN0REI7VHJ1c3RlZF9Db25uZWN0aW9uPXllczsiCiAgICAKICAgIHRyeToKICAgICAgICB3aXRoIHB5b2RiYy5jb25uZWN0KGNvbm5fc3RyKSBhcyBjb25uOgogICAgICAgICAgICBjb25uLmF1dG9jb21taXQgPSBGYWxzZQogICAgICAgICAgICB3aXRoIGNvbm4uY3Vyc29yKCkgYXMgY3Vyc29yOgogICAgICAgICAgICAgICAgY3Vyc29yLmZhc3RfZXhlY3V0ZW1hbnkgPSBUcnVlCiAgICAgICAgICAgICAgICBzcWw6IHN0ciA9ICJJTlNFUlQgSU5UTyBJbnZlbnRvcnkgKEl0ZW1OYW1lLCBRdWFudGl0eSkgVkFMVUVTICg/LCA/KSIKICAgICAgICAgICAgICAgIGN1cnNvci5leGVjdXRlbWFueShzcWwsIGRhdGEpCiAgICAgICAgICAgIGNvbm4uY29tbWl0KCkKICAgICAgICAgICAgcHJpbnQoZiJTdWNjZXNzZnVsbHkgaW5zZXJ0ZWQge2xlbihkYXRhKX0gcm93cy4iKQogICAgZXhjZXB0IHB5b2RiYy5EYXRhYmFzZUVycm9yIGFzIGU6CiAgICAgICAgcHJpbnQoZiJEYXRhYmFzZSBlcnJvciBvY2N1cnJlZDoge2V9IikKICAgICAgICBpZiAnY29ubicgaW4gbG9jYWxzKCk6CiAgICAgICAgICAgIGNvbm4ucm9sbGJhY2soKQogICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHByaW50KGYiVW5leHBlY3RlZCBlcnJvcjoge2V9IikKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBzYW1wbGVfZGF0YTogTGlzdFtUdXBsZVtzdHIsIGludF1dID0gWygiTGFwdG9wIiwgMTApLCAoIk1vdXNlIiwgNTApLCAoIk1vbml0b3IiLCAxNSldCiAgICBidWxrX2luc2VydF9kYXRhKHNhbXBsZV9kYXRhKQpgYGAKCi0tLQoKIyMjIENhc28gMzogUGF0csOzbiBkZSBSZXBvc2l0b3JpbyBSZXNpbGllbnRlIHBhcmEgUHJvZHVjY2nDs24KKiAqKkVzY2VuYXJpbzoqKiBJbXBsZW1lbnRhY2nDs24gZGUgdW4gZ2VzdG9yIGRlIGJhc2UgZGUgZGF0b3MgY29uIHJlaW50ZW50b3MgeSB0aXBhZG8gZXN0cmljdG8gcGFyYSBhcGxpY2FjaW9uZXMgZGUgYWx0YSBkaXNwb25pYmlsaWRhZC4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgcHlvZGJjCmltcG9ydCB0aW1lCmZyb20gdHlwaW5nIGltcG9ydCBPcHRpb25hbCwgQW55CgpjbGFzcyBTUUxSZXBvc2l0b3J5OgogICAgZGVmIF9faW5pdF9fKHNlbGYsIGNvbm5lY3Rpb25fc3RyaW5nOiBzdHIpOgogICAgICAgIHNlbGYuY29ubl9zdHIgPSBjb25uZWN0aW9uX3N0cmluZwoKICAgIGRlZiBleGVjdXRlX3F1ZXJ5KHNlbGYsIHF1ZXJ5OiBzdHIsIHBhcmFtczogdHVwbGUgPSAoKSwgcmV0cmllczogaW50ID0gMykgLT4gT3B0aW9uYWxbQW55XToKICAgICAgICBmb3IgYXR0ZW1wdCBpbiByYW5nZShyZXRyaWVzKToKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgd2l0aCBweW9kYmMuY29ubmVjdChzZWxmLmNvbm5fc3RyKSBhcyBjb25uOgogICAgICAgICAgICAgICAgICAgIHdpdGggY29ubi5jdXJzb3IoKSBhcyBjdXJzb3I6CiAgICAgICAgICAgICAgICAgICAgICAgIGN1cnNvci5leGVjdXRlKHF1ZXJ5LCBwYXJhbXMpCiAgICAgICAgICAgICAgICAgICAgICAgIGlmIHF1ZXJ5LnN0cmlwKCkudXBwZXIoKS5zdGFydHN3aXRoKCJTRUxFQ1QiKToKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBjdXJzb3IuZmV0Y2hhbGwoKQogICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gTm9uZQogICAgICAgICAgICBleGNlcHQgKHB5b2RiYy5PcGVyYXRpb25hbEVycm9yLCBweW9kYmMuUHJvZ3JhbW1pbmdFcnJvcikgYXMgZToKICAgICAgICAgICAgICAgIGlmIGF0dGVtcHQgPT0gcmV0cmllcyAtIDE6CiAgICAgICAgICAgICAgICAgICAgcmFpc2UgZQogICAgICAgICAgICAgICAgdGltZS5zbGVlcCgyICoqIGF0dGVtcHQpICAjIEV4cG9uZW50aWFsIGJhY2tvZmYKICAgICAgICByZXR1cm4gTm9uZQoKIyBVc28gZW4gcHJvZHVjY2nDs24KcmVwbyA9IFNRTFJlcG9zaXRvcnkoIkRyaXZlcj17T0RCQyBEcml2ZXIgMTggZm9yIFNRTCBTZXJ2ZXJ9O1NlcnZlcj1teV9zZXJ2ZXI7RGF0YWJhc2U9bXlfZGI7VUlEPXVzZXI7UFdEPXBhc3M7IikKcmVzdWx0cyA9IHJlcG8uZXhlY3V0ZV9xdWVyeSgiU0VMRUNUIFRPUCA1ICogRlJPTSBMb2dzIFdIRVJFIFNldmVyaXR5ID0gPyIsICgiRXJyb3IiLCkpCnByaW50KHJlc3VsdHMpCmBgYAoKLS0tCgoKIyMg4pqg77iPIENvbnNpZGVyYWNpb25lcyBUw6ljbmljYXMgeSBHb3RjaGFzCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBVdGlsaXphciBzaWVtcHJlIGNvbnN1bHRhcyBwYXJhbWV0cml6YWRhcyBwYXJhIHByZXZlbmlyIGF0YXF1ZXMgZGUgU1FMIEluamVjdGlvbi4KKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIEhhYmlsaXRhciAnRW5jcnlwdD15ZXMnIGVuIGxhIGNhZGVuYSBkZSBjb25leGnDs24gcGFyYSBwcm90ZWdlciBkYXRvcyBlbiB0csOhbnNpdG8sIGVzcGVjaWFsbWVudGUgZW4gQXp1cmUgU1FMLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogVXNhciAnZmFzdF9leGVjdXRlbWFueSA9IFRydWUnIHBhcmEgbWVqb3JhciBkcsOhc3RpY2FtZW50ZSBlbCByZW5kaW1pZW50byBkZSBpbnNlcmNpb25lcyBtYXNpdmFzLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogSW1wbGVtZW50YXIgbMOzZ2ljYSBkZSByZWludGVudG9zIChSZXRyeSBMb2dpYykgcGFyYSBtYW5lamFyIGRlc2NvbmV4aW9uZXMgdHJhbnNpdG9yaWFzIGVuIGVudG9ybm9zIGNsb3VkLgoqICoqR290Y2hhL0FsZXJ0YToqKiBObyBjZXJyYXIgbG9zIGN1cnNvcmVzIG8gY29uZXhpb25lcywgbG8gcXVlIGFnb3RhIGVsIHBvb2wgZGUgY29uZXhpb25lcyBkZWwgc2Vydmlkb3IuCiogKipHb3RjaGEvQWxlcnRhOioqIEhhcmRjb2RlYXIgY3JlZGVuY2lhbGVzIGVuIGVsIGPDs2RpZ28gZW4gbHVnYXIgZGUgdXNhciB2YXJpYWJsZXMgZGUgZW50b3JubyBvIEF6dXJlIEtleSBWYXVsdC4KKiAqKkdvdGNoYS9BbGVydGE6KiogSWdub3JhciBlbCB0aW1lb3V0IGRlIGNvbmV4acOzbiBwcmVkZXRlcm1pbmFkbywgbG8gcXVlIHB1ZWRlIGJsb3F1ZWFyIGxhIGFwbGljYWNpw7NuIGVuIHJlZGVzIGluZXN0YWJsZXMuCgotLS0KCiMjIPCflJcgTm9kb3MgUmVsYWNpb25hZG9zIGVuIGVsIEdyYWZvCiogW1swMV9Ta2lsbHMvU0tJTExfMDAxX1NjcmFwaW5nX3lfRXh0cmFjY2lvbl9XZWJ8SGFiaWxpZGFkIFTDqWNuaWNhOiBTY3JhcGluZyB5IEV4dHJhY2Npw7NuIFdlYl1dCiogW1swM19Qcm95ZWN0b3MvUFJPSl8wMDFfQWdlbnRlX1NjcmFwZXJ8UHJveWVjdG86IEFnZW50ZSBTY3JhcGVyXV0K" download="CU_020_mssql-python-integration.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>Microsoft SQL es un ecosistema de base de datos relacional que abarca desde instancias locales (SQL Server) hasta soluciones en la nube (Azure SQL Database, Managed Instance). Ofrece capacidades de procesamiento transaccional de alto rendimiento, integración con IA y soporte multi-modelo. Para desarrolladores Python, la conectividad se estandariza mediante el driver ODBC, permitiendo operaciones seguras y escalables en entornos empresariales.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Quickstart: Conexión y Consulta Básica</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Establecer una conexión segura con SQL Server o Azure SQL y ejecutar una consulta T-SQL simple utilizando parámetros para evitar inyecciones.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import pyodbc
+from typing import List, Tuple
+
+def fetch_server_version() -&gt; str:
+    conn_str: str = (
+        "Driver={ODBC Driver 18 for SQL Server};"
+        "Server=tcp:your-server.database.windows.net,1433;"
+        "Database=your-db;Uid=your-user;Pwd=your-password;"
+        "Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    )
+    
+    with pyodbc.connect(conn_str) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT @@VERSION")
+            row: Tuple = cursor.fetchone()
+            return str(row[0]) if row else "No data"
+
+if __name__ == "__main__":
+    print(f"Connected to: {fetch_server_version()}")</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Procesamiento por Lotes con Manejo de Errores</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Insertar múltiples registros de forma eficiente utilizando fast_executemany y capturando excepciones específicas de la base de datos.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import pyodbc
+from typing import List, Tuple
+
+def bulk_insert_data(data: List[Tuple[str, int]]) -&gt; None:
+    conn_str: str = "Driver={ODBC Driver 18 for SQL Server};Server=localhost;Database=TestDB;Trusted_Connection=yes;"
+    
+    try:
+        with pyodbc.connect(conn_str) as conn:
+            conn.autocommit = False
+            with conn.cursor() as cursor:
+                cursor.fast_executemany = True
+                sql: str = "INSERT INTO Inventory (ItemName, Quantity) VALUES (?, ?)"
+                cursor.executemany(sql, data)
+            conn.commit()
+            print(f"Successfully inserted {len(data)} rows.")
+    except pyodbc.DatabaseError as e:
+        print(f"Database error occurred: {e}")
+        if 'conn' in locals():
+            conn.rollback()
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+if __name__ == "__main__":
+    sample_data: List[Tuple[str, int]] = [("Laptop", 10), ("Mouse", 50), ("Monitor", 15)]
+    bulk_insert_data(sample_data)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Repositorio Resiliente para Producción</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementación de un gestor de base de datos con reintentos y tipado estricto para aplicaciones de alta disponibilidad.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import pyodbc
+import time
+from typing import Optional, Any
+
+class SQLRepository:
+    def __init__(self, connection_string: str):
+        self.conn_str = connection_string
+
+    def execute_query(self, query: str, params: tuple = (), retries: int = 3) -&gt; Optional[Any]:
+        for attempt in range(retries):
+            try:
+                with pyodbc.connect(self.conn_str) as conn:
+                    with conn.cursor() as cursor:
+                        cursor.execute(query, params)
+                        if query.strip().upper().startswith("SELECT"):
+                            return cursor.fetchall()
+                        return None
+            except (pyodbc.OperationalError, pyodbc.ProgrammingError) as e:
+                if attempt == retries - 1:
+                    raise e
+                time.sleep(2 ** attempt)  # Exponential backoff
+        return None
+
+# Uso en producción
+repo = SQLRepository("Driver={ODBC Driver 18 for SQL Server};Server=my_server;Database=my_db;UID=user;PWD=pass;")
+results = repo.execute_query("SELECT TOP 5 * FROM Logs WHERE Severity = ?", ("Error",))
+print(results)</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar siempre consultas parametrizadas para prevenir ataques de SQL Injection.</li><li>✅ <strong>Práctica:</strong> Habilitar 'Encrypt=yes' en la cadena de conexión para proteger datos en tránsito, especialmente en Azure SQL.</li><li>✅ <strong>Práctica:</strong> Usar 'fast_executemany = True' para mejorar drásticamente el rendimiento de inserciones masivas.</li><li>✅ <strong>Práctica:</strong> Implementar lógica de reintentos (Retry Logic) para manejar desconexiones transitorias en entornos cloud.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> No cerrar los cursores o conexiones, lo que agota el pool de conexiones del servidor.</li><li>⚠️ <strong>Alerta:</strong> Hardcodear credenciales en el código en lugar de usar variables de entorno o Azure Key Vault.</li><li>⚠️ <strong>Alerta:</strong> Ignorar el timeout de conexión predeterminado, lo que puede bloquear la aplicación en redes inestables.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

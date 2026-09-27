@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatización e Integración de Tailwind CSS con Python — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">Automatización e Integración de Tailwind CSS con Python</h1>
+            <p>Documentación analizada por el Agente Scraper (Fábrica de Software)</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>fastapi>=0.100.0 uvicorn>=0.22.0 pydantic>=2.0.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#tailwindcss</span><span class="tag">#vite</span><span class="tag">#automation</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMTMtVEFJTFdJTkQtVklURS1QWVRIT04tSU5URUdSQVRJT04KdGl0bGU6IEF1dG9tYXRpemFjacOzbiBlIEludGVncmFjacOzbiBkZSBUYWlsd2luZCBDU1MgY29uIFB5dGhvbgp0eXBlOiB1c2UtY2FzZQp2ZXJzaW9uOiAxLjAuMApzdGF0dXM6IGFjdGl2ZQpjcmVhdGVkX2F0OiAnMjAyNi0wOC0yOVQxOTo0ODo0Mi4xNzE1NzMtMDU6MDAnCnVwZGF0ZWRfYXQ6ICcyMDI2LTA4LTI5VDE5OjQ4OjQyLjE3MTU3My0wNTowMCcKc291cmNlX3VybDogaHR0cHM6Ly90YWlsd2luZGNzcy5jb20vZG9jcy9pbnN0YWxsYXRpb24vdXNpbmctdml0ZQp0YWdzOgotIHB5dGhvbgotIHRhaWx3aW5kY3NzCi0gdml0ZQotIGF1dG9tYXRpb24KLSBjYXNvLWRlLXVzbwpza2lsbHNfcmVxdWlyZWQ6Ci0gMDFfU2tpbGxzL1NLSUxMLTAwMS1TQ1JBUElORy1FWFRSQUNDSU9OLVdFQgpkZXBlbmRlbmNpZXM6Ci0gZmFzdGFwaT49MC4xMDAuMAotIHV2aWNvcm4+PTAuMjIuMAotIHB5ZGFudGljPj0yLjAuMApjb21wbGV4aXR5OiBpbnRlcm1lZGlhdGUKc2VtYW50aWNfc3VtbWFyeTogVGFpbHdpbmQgQ1NTIGVzIHVuIGZyYW1ld29yayBkZSBkaXNlw7FvIGJhc2FkbyBlbiB1dGlsaWRhZGVzIHF1ZQogIG9wdGltaXphIGxhIGdlbmVyYWNpw7NuIGRlIGVzdGlsb3MgbWVkaWFudGUgZWwgZXNjYW5lbyBkZSBhcmNoaXZvcy4gU3UgaW50ZWdyYWNpw7NuCiAgY29uIFZpdGUgcGVybWl0ZSB1biBmbHVqbyBkZSBkZXNhcnJvbGxvIHVsdHJhIHLDoXBpZG8gY29uIHJlY2FyZ2EgZW4gY2FsaWVudGUuIEVuCiAgZW50b3Jub3MgUHl0aG9uLCBlc3RhIGhlcnJhbWllbnRhIHNlIHV0aWxpemEgcGFyYSBvcnF1ZXN0YXIgZWwgZnJvbnRlbmQgbW9kZXJubwogIGRlbnRybyBkZSBhcGxpY2FjaW9uZXMgd2ViIHJvYnVzdGFzLCBwZXJtaXRpZW5kbyB1bmEgc2VwYXJhY2nDs24gY2xhcmEgZW50cmUgbGEgbMOzZ2ljYQogIGRlIG5lZ29jaW8geSBsYSBpbnRlcmZheiBkZSB1c3VhcmlvIGFsdGFtZW50ZSBvcHRpbWl6YWRhLgotLS0KCiMg8J+SoSBBdXRvbWF0aXphY2nDs24gZSBJbnRlZ3JhY2nDs24gZGUgVGFpbHdpbmQgQ1NTIGNvbiBQeXRob24KCj4gKipPcmlnZW46KiogW2h0dHBzOi8vdGFpbHdpbmRjc3MuY29tL2RvY3MvaW5zdGFsbGF0aW9uL3VzaW5nLXZpdGVdKGh0dHBzOi8vdGFpbHdpbmRjc3MuY29tL2RvY3MvaW5zdGFsbGF0aW9uL3VzaW5nLXZpdGUpICAKPiAqKkNvbXBsZWppZGFkOioqIGBpbnRlcm1lZGlhdGVgIHwgKipFc3TDoW5kYXI6KiogYE9LRiB2MS4wLjBgCgotLS0KCiMjIPCfk4wgUmVzdW1lbiBDb25jZXB0dWFsIHkgUHJvcMOzc2l0bwpUYWlsd2luZCBDU1MgZXMgdW4gZnJhbWV3b3JrIGRlIGRpc2XDsW8gYmFzYWRvIGVuIHV0aWxpZGFkZXMgcXVlIG9wdGltaXphIGxhIGdlbmVyYWNpw7NuIGRlIGVzdGlsb3MgbWVkaWFudGUgZWwgZXNjYW5lbyBkZSBhcmNoaXZvcy4gU3UgaW50ZWdyYWNpw7NuIGNvbiBWaXRlIHBlcm1pdGUgdW4gZmx1am8gZGUgZGVzYXJyb2xsbyB1bHRyYSByw6FwaWRvIGNvbiByZWNhcmdhIGVuIGNhbGllbnRlLiBFbiBlbnRvcm5vcyBQeXRob24sIGVzdGEgaGVycmFtaWVudGEgc2UgdXRpbGl6YSBwYXJhIG9ycXVlc3RhciBlbCBmcm9udGVuZCBtb2Rlcm5vIGRlbnRybyBkZSBhcGxpY2FjaW9uZXMgd2ViIHJvYnVzdGFzLCBwZXJtaXRpZW5kbyB1bmEgc2VwYXJhY2nDs24gY2xhcmEgZW50cmUgbGEgbMOzZ2ljYSBkZSBuZWdvY2lvIHkgbGEgaW50ZXJmYXogZGUgdXN1YXJpbyBhbHRhbWVudGUgb3B0aW1pemFkYS4KCmBgYG1lcm1haWQKZ3JhcGggTFIKICAgIElucHV0WyJFbnRyYWRhIC8gQ29uZmlndXJhY2nDs24iXSAtLT4gTG9naWNbIkzDs2dpY2EgZGUgdGFpbHdpbmQtdml0ZS1weXRob24taW50ZWdyYXRpb24iXQogICAgTG9naWMgLS0+IE91dHB1dFsiUmVzdWx0YWRvIFZhbGlkYWRvIl0KYGBgCgotLS0KCiMjIPCfm6DvuI8gUmVxdWlzaXRvcyBkZSBJbnN0YWxhY2nDs24KYGBgYmFzaApwaXAgaW5zdGFsbCBmYXN0YXBpPj0wLjEwMC4wIHV2aWNvcm4+PTAuMjIuMCBweWRhbnRpYz49Mi4wLjAKYGBgCgotLS0KCiMjIPCfmoAgQ2Fzb3MgZGUgVXNvIHkgU2NyaXB0cyBNaW5pbWFsaXN0YXMKCiMjIyBDYXNvIDE6IFNjYWZmb2xkaW5nIEF1dG9tYXRpemFkbyBkZSBQcm95ZWN0byBUYWlsd2luZC9WaXRlCiogKipFc2NlbmFyaW86KiogU2NyaXB0IHBhcmEgaW5pY2lhbGl6YXIgYXV0b23DoXRpY2FtZW50ZSBsYSBlc3RydWN0dXJhIGRlIGFyY2hpdm9zIHkgZGVwZW5kZW5jaWFzIGRlIE5vZGUuanMgbmVjZXNhcmlhcyBwYXJhIFRhaWx3aW5kIENTUyBkZXNkZSB1biBlbnRvcm5vIFB5dGhvbi4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgc3VicHJvY2VzcwppbXBvcnQgb3MKZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgpkZWYgc2V0dXBfdGFpbHdpbmRfdml0ZShwcm9qZWN0X25hbWU6IHN0cik6CiAgICBwYXRoID0gUGF0aChwcm9qZWN0X25hbWUpCiAgICBwYXRoLm1rZGlyKGV4aXN0X29rPVRydWUpCiAgICAKICAgIGNvbW1hbmRzID0gWwogICAgICAgIGYibnBtIGNyZWF0ZSB2aXRlQGxhdGVzdCB7cHJvamVjdF9uYW1lfSAtLSAtLXRlbXBsYXRlIHZhbmlsbGEiLAogICAgICAgIGYiY2Qge3Byb2plY3RfbmFtZX0gJiYgbnBtIGluc3RhbGwgdGFpbHdpbmRjc3MgQHRhaWx3aW5kY3NzL3ZpdGUiLAogICAgXQogICAgCiAgICBmb3IgY21kIGluIGNvbW1hbmRzOgogICAgICAgIHN1YnByb2Nlc3MucnVuKGNtZCwgc2hlbGw9VHJ1ZSwgY2hlY2s9VHJ1ZSkKCiAgICB2aXRlX2NvbmZpZyA9ICIiImltcG9ydCB7IGRlZmluZUNvbmZpZyB9IGZyb20gJ3ZpdGUnCmltcG9ydCB0YWlsd2luZGNzcyBmcm9tICdAdGFpbHdpbmRjc3Mvdml0ZScKZXhwb3J0IGRlZmF1bHQgZGVmaW5lQ29uZmlnKHsKICBwbHVnaW5zOiBbdGFpbHdpbmRjc3MoKV0sCn0pIiIiCiAgICAKICAgIHdpdGggb3BlbihwYXRoIC8gInZpdGUuY29uZmlnLnRzIiwgInciKSBhcyBmOgogICAgICAgIGYud3JpdGUodml0ZV9jb25maWcpCgogICAgd2l0aCBvcGVuKHBhdGggLyAic3JjL3N0eWxlLmNzcyIsICJ3IikgYXMgZjoKICAgICAgICBmLndyaXRlKCdAaW1wb3J0ICJ0YWlsd2luZGNzcyI7JykKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBzZXR1cF90YWlsd2luZF92aXRlKCJteS10YWlsd2luZC1hcHAiKQpgYGAKCi0tLQoKIyMjIENhc28gMjogT3JxdWVzdGFkb3IgQXPDrW5jcm9ubyBkZSBTZXJ2aWRvciBkZSBEZXNhcnJvbGxvCiogKipFc2NlbmFyaW86KiogRWplY3VjacOzbiBjb25jdXJyZW50ZSBkZWwgc2Vydmlkb3IgZGUgZGVzYXJyb2xsbyBkZSBWaXRlIGp1bnRvIGNvbiB1biBiYWNrZW5kIGRlIFB5dGhvbiwgbWFuZWphbmRvIGVycm9yZXMgZGUgcHJvY2VzbyB5IHNlw7FhbGVzIGRlIGludGVycnVwY2nDs24uCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IGFzeW5jaW8KaW1wb3J0IHN5cwoKYXN5bmMgZGVmIHJ1bl9wcm9jZXNzKGNvbW1hbmQ6IHN0ciwgcHJlZml4OiBzdHIpOgogICAgcHJvY2VzcyA9IGF3YWl0IGFzeW5jaW8uY3JlYXRlX3N1YnByb2Nlc3Nfc2hlbGwoCiAgICAgICAgY29tbWFuZCwKICAgICAgICBzdGRvdXQ9YXN5bmNpby5zdWJwcm9jZXNzLlBJUEUsCiAgICAgICAgc3RkZXJyPWFzeW5jaW8uc3VicHJvY2Vzcy5QSVBFCiAgICApCgogICAgYXN5bmMgZGVmIGxvZ19zdHJlYW0oc3RyZWFtLCBwKToKICAgICAgICB3aGlsZSBUcnVlOgogICAgICAgICAgICBsaW5lID0gYXdhaXQgc3RyZWFtLnJlYWRsaW5lKCkKICAgICAgICAgICAgaWYgbGluZToKICAgICAgICAgICAgICAgIHByaW50KGYiW3twfV0ge2xpbmUuZGVjb2RlKCkuc3RyaXAoKX0iKQogICAgICAgICAgICBlbHNlOgogICAgICAgICAgICAgICAgYnJlYWsKCiAgICBhd2FpdCBhc3luY2lvLmdhdGhlcigKICAgICAgICBsb2dfc3RyZWFtKHByb2Nlc3Muc3Rkb3V0LCBwcmVmaXgpLAogICAgICAgIGxvZ19zdHJlYW0ocHJvY2Vzcy5zdGRlcnIsIHByZWZpeCkKICAgICkKCmFzeW5jIGRlZiBtYWluKCk6CiAgICB0cnk6CiAgICAgICAgYXdhaXQgYXN5bmNpby5nYXRoZXIoCiAgICAgICAgICAgIHJ1bl9wcm9jZXNzKCJucG0gcnVuIGRldiIsICJWSVRFIiksCiAgICAgICAgICAgIHJ1bl9wcm9jZXNzKCJweXRob24gLW0gdXZpY29ybiBtYWluOmFwcCAtLXJlbG9hZCIsICJQWS1BUEkiKQogICAgICAgICkKICAgIGV4Y2VwdCBLZXlib2FyZEludGVycnVwdDoKICAgICAgICBwcmludCgiXG5TdG9wcGluZyBzZXJ2ZXJzLi4uIikKICAgICAgICBzeXMuZXhpdCgwKQoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIGFzeW5jaW8ucnVuKG1haW4oKSkKYGBgCgotLS0KCiMjIyBDYXNvIDM6IFBhdHLDs24gZGUgUHJvZHVjY2nDs246IElueWVjY2nDs24gZGUgQXNzZXRzIENvbXBpbGFkb3MKKiAqKkVzY2VuYXJpbzoqKiBJbnRlZ3JhY2nDs24gYXZhbnphZGEgZW4gRmFzdEFQSSBwYXJhIHNlcnZpciBhcmNoaXZvcyBlc3TDoXRpY29zIGdlbmVyYWRvcyBwb3IgVGFpbHdpbmQvVml0ZSwgZGV0ZWN0YW5kbyBhdXRvbcOhdGljYW1lbnRlIGVsIG1hbmlmaWVzdG8gZGUgY29tcGlsYWNpw7NuLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmZyb20gZmFzdGFwaSBpbXBvcnQgRmFzdEFQSQpmcm9tIGZhc3RhcGkuc3RhdGljZmlsZXMgaW1wb3J0IFN0YXRpY0ZpbGVzCmZyb20gZmFzdGFwaS5yZXNwb25zZXMgaW1wb3J0IEZpbGVSZXNwb25zZQppbXBvcnQganNvbgpmcm9tIHBhdGhsaWIgaW1wb3J0IFBhdGgKCmFwcCA9IEZhc3RBUEkoKQoKY2xhc3MgVml0ZUFzc2V0TWFuYWdlcjoKICAgIGRlZiBfX2luaXRfXyhzZWxmLCBkaXN0X3BhdGg6IHN0cik6CiAgICAgICAgc2VsZi5kaXN0X3BhdGggPSBQYXRoKGRpc3RfcGF0aCkKICAgICAgICBzZWxmLm1hbmlmZXN0ID0gc2VsZi5fbG9hZF9tYW5pZmVzdCgpCgogICAgZGVmIF9sb2FkX21hbmlmZXN0KHNlbGYpOgogICAgICAgIG1hbmlmZXN0X3BhdGggPSBzZWxmLmRpc3RfcGF0aCAvICIudml0ZS9tYW5pZmVzdC5qc29uIgogICAgICAgIGlmIG1hbmlmZXN0X3BhdGguZXhpc3RzKCk6CiAgICAgICAgICAgIHdpdGggb3BlbihtYW5pZmVzdF9wYXRoKSBhcyBmOgogICAgICAgICAgICAgICAgcmV0dXJuIGpzb24ubG9hZChmKQogICAgICAgIHJldHVybiB7fQoKICAgIGRlZiBnZXRfbWFpbl9jc3Moc2VsZikgLT4gc3RyOgogICAgICAgICMgTMOzZ2ljYSBwYXJhIGV4dHJhZXIgZWwgcGF0aCBkZWwgQ1NTIGdlbmVyYWRvIHBvciBUYWlsd2luZAogICAgICAgIHJldHVybiBzZWxmLm1hbmlmZXN0LmdldCgiaW5kZXguaHRtbCIsIHt9KS5nZXQoImNzcyIsIFsic3R5bGUuY3NzIl0pWzBdCgphc3NldF9tYW5hZ2VyID0gVml0ZUFzc2V0TWFuYWdlcigiZGlzdCIpCgppZiBQYXRoKCJkaXN0IikuZXhpc3RzKCk6CiAgICBhcHAubW91bnQoIi9hc3NldHMiLCBTdGF0aWNGaWxlcyhkaXJlY3Rvcnk9ImRpc3QvYXNzZXRzIiksIG5hbWU9InN0YXRpYyIpCgpAYXBwLmdldCgiLyIpCmFzeW5jIGRlZiBzZXJ2ZV9zcGEoKToKICAgIHJldHVybiBGaWxlUmVzcG9uc2UoImRpc3QvaW5kZXguaHRtbCIpCgpAYXBwLmdldCgiL2hlYWx0aCIpCmFzeW5jIGRlZiBoZWFsdGhfY2hlY2soKToKICAgIHJldHVybiB7InN0YXR1cyI6ICJvbmxpbmUiLCAiY3NzX2J1bmRsZWQiOiBhc3NldF9tYW5hZ2VyLmdldF9tYWluX2NzcygpfQpgYGAKCi0tLQoKCiMjIOKaoO+4jyBDb25zaWRlcmFjaW9uZXMgVMOpY25pY2FzIHkgR290Y2hhcwoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogVXRpbGl6YXIgZWwgcGx1Z2luIG9maWNpYWwgQHRhaWx3aW5kY3NzL3ZpdGUgcGFyYSB1bmEgaW50ZWdyYWNpw7NuIG5hdGl2YSBzaW4gY29uZmlndXJhY2lvbmVzIFBvc3RDU1MgbWFudWFsZXMuCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBNYW50ZW5lciBlbCBjb21hbmRvIGRlIGVzY2FuZW8gZGUgY2xhc2VzIGFjdGl2byBkdXJhbnRlIGVsIGRlc2Fycm9sbG8gcGFyYSBldml0YXIgZXN0aWxvcyBmYWx0YW50ZXMuCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBFbiBwcm9kdWNjacOzbiwgc2llbXByZSBzZXJ2aXIgbG9zIGFyY2hpdm9zIGRlc2RlIGxhIGNhcnBldGEgJ2Rpc3QnIGdlbmVyYWRhIHRyYXMgZWwgYnVpbGQgZGUgVml0ZS4KKiAqKkdvdGNoYS9BbGVydGE6KiogTm8gaW5jbHVpciBlbCBhcmNoaXZvIENTUyBjb24gZWwgQGltcG9ydCAndGFpbHdpbmRjc3MnIGVuIGVsIHB1bnRvIGRlIGVudHJhZGEgcHJpbmNpcGFsLgoqICoqR290Y2hhL0FsZXJ0YToqKiBJbnRlbnRhciBlamVjdXRhciBlbCBzZXJ2aWRvciBkZSBkZXNhcnJvbGxvIGRlIFZpdGUgc2luIGhhYmVyIGluc3RhbGFkbyBsYXMgZGVwZW5kZW5jaWFzIGRlIE5vZGUuanMgcHJldmlhbWVudGUuCiogKipHb3RjaGEvQWxlcnRhOioqIENvbmZsaWN0b3MgZGUgcHVlcnRvcyBlbnRyZSBlbCBzZXJ2aWRvciBkZSBWaXRlIChwb3IgZGVmZWN0byA1MTczKSB5IGVsIGJhY2tlbmQgZGUgUHl0aG9uLgoKLS0tCgojIyDwn5SXIE5vZG9zIFJlbGFjaW9uYWRvcyBlbiBlbCBHcmFmbwoqIFtbMDBfSW5kaWNlX0ZhYnJpY2F8TU9DIENlbnRyYWxdXQoqIFtbMDJfQ2Fzb3NfZGVfVXNvLzAyX0luZGljZV9DYXNvc19kZV9Vc298w41uZGljZSBkZSBDYXNvcyBkZSBVc29dXQoqIFtbMDFfU2tpbGxzLzAxX0luZGljZV9Ta2lsbHN8w41uZGljZSBkZSBTa2lsbHNdXQo=" download="CU_013_tailwind-vite-python-integration.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>Tailwind CSS es un framework de diseño basado en utilidades que optimiza la generación de estilos mediante el escaneo de archivos. Su integración con Vite permite un flujo de desarrollo ultra rápido con recarga en caliente. En entornos Python, esta herramienta se utiliza para orquestar el frontend moderno dentro de aplicaciones web robustas, permitiendo una separación clara entre la lógica de negocio y la interfaz de usuario altamente optimizada.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Scaffolding Automatizado de Proyecto Tailwind/Vite</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Script para inicializar automáticamente la estructura de archivos y dependencias de Node.js necesarias para Tailwind CSS desde un entorno Python.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import subprocess
+import os
+from pathlib import Path
+
+def setup_tailwind_vite(project_name: str):
+    path = Path(project_name)
+    path.mkdir(exist_ok=True)
+    
+    commands = [
+        f"npm create vite@latest {project_name} -- --template vanilla",
+        f"cd {project_name} &amp;&amp; npm install tailwindcss @tailwindcss/vite",
+    ]
+    
+    for cmd in commands:
+        subprocess.run(cmd, shell=True, check=True)
+
+    vite_config = """import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
+export default defineConfig({
+  plugins: [tailwindcss()],
+})"""
+    
+    with open(path / "vite.config.ts", "w") as f:
+        f.write(vite_config)
+
+    with open(path / "src/style.css", "w") as f:
+        f.write('@import "tailwindcss";')
+
+if __name__ == "__main__":
+    setup_tailwind_vite("my-tailwind-app")</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Orquestador Asíncrono de Servidor de Desarrollo</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Ejecución concurrente del servidor de desarrollo de Vite junto con un backend de Python, manejando errores de proceso y señales de interrupción.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import asyncio
+import sys
+
+async def run_process(command: str, prefix: str):
+    process = await asyncio.create_subprocess_shell(
+        command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+
+    async def log_stream(stream, p):
+        while True:
+            line = await stream.readline()
+            if line:
+                print(f"[{p}] {line.decode().strip()}")
+            else:
+                break
+
+    await asyncio.gather(
+        log_stream(process.stdout, prefix),
+        log_stream(process.stderr, prefix)
+    )
+
+async def main():
+    try:
+        await asyncio.gather(
+            run_process("npm run dev", "VITE"),
+            run_process("python -m uvicorn main:app --reload", "PY-API")
+        )
+    except KeyboardInterrupt:
+        print("\nStopping servers...")
+        sys.exit(0)
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Producción: Inyección de Assets Compilados</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Integración avanzada en FastAPI para servir archivos estáticos generados por Tailwind/Vite, detectando automáticamente el manifiesto de compilación.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import json
+from pathlib import Path
+
+app = FastAPI()
+
+class ViteAssetManager:
+    def __init__(self, dist_path: str):
+        self.dist_path = Path(dist_path)
+        self.manifest = self._load_manifest()
+
+    def _load_manifest(self):
+        manifest_path = self.dist_path / ".vite/manifest.json"
+        if manifest_path.exists():
+            with open(manifest_path) as f:
+                return json.load(f)
+        return {}
+
+    def get_main_css(self) -&gt; str:
+        # Lógica para extraer el path del CSS generado por Tailwind
+        return self.manifest.get("index.html", {}).get("css", ["style.css"])[0]
+
+asset_manager = ViteAssetManager("dist")
+
+if Path("dist").exists():
+    app.mount("/assets", StaticFiles(directory="dist/assets"), name="static")
+
+@app.get("/")
+async def serve_spa():
+    return FileResponse("dist/index.html")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "online", "css_bundled": asset_manager.get_main_css()}</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar el plugin oficial @tailwindcss/vite para una integración nativa sin configuraciones PostCSS manuales.</li><li>✅ <strong>Práctica:</strong> Mantener el comando de escaneo de clases activo durante el desarrollo para evitar estilos faltantes.</li><li>✅ <strong>Práctica:</strong> En producción, siempre servir los archivos desde la carpeta 'dist' generada tras el build de Vite.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> No incluir el archivo CSS con el @import 'tailwindcss' en el punto de entrada principal.</li><li>⚠️ <strong>Alerta:</strong> Intentar ejecutar el servidor de desarrollo de Vite sin haber instalado las dependencias de Node.js previamente.</li><li>⚠️ <strong>Alerta:</strong> Conflictos de puertos entre el servidor de Vite (por defecto 5173) y el backend de Python.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Fábrica de Software Autónoma | Grafo de Conocimiento Interoperable (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatización y Gestión de Entornos Laravel en Python — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Automatización y Gestión de Entornos Laravel en Python</h1>
+            <p>Documentación técnica analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <strong>Documentación Oficial:</strong> <a href="https://laravel-com.translate.goog/framework/docs/installation?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc" target="_blank" style="color: #79f2f0; text-decoration: underline; font-family: monospace;">https://laravel-com.translate.goog/framework/docs/installation?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc ↗</a></span>
+                <span>📦 Dependencias: <code>requests>=2.31.0 pydantic>=2.0.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#laravel</span><span class="tag">#automation</span><span class="tag">#devops</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0 (Obsidian)</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wNDAtTEFSQVZFTC1FTlZJUk9OTUVOVC1BVVRPTUFUSU9OCnRpdGxlOiBBdXRvbWF0aXphY2nDs24geSBHZXN0acOzbiBkZSBFbnRvcm5vcyBMYXJhdmVsIGVuIFB5dGhvbgp0eXBlOiB1c2UtY2FzZQp2ZXJzaW9uOiAxLjAuMApzdGF0dXM6IGFjdGl2ZQpjcmVhdGVkX2F0OiAnMjAyNi0wOS0wNVQwOToxMDozNi4wNDEzNTgtMDU6MDAnCnVwZGF0ZWRfYXQ6ICcyMDI2LTA5LTA1VDA5OjEwOjM2LjA0MTM1OC0wNTowMCcKc291cmNlX3VybDogaHR0cHM6Ly9sYXJhdmVsLWNvbS50cmFuc2xhdGUuZ29vZy9mcmFtZXdvcmsvZG9jcy9pbnN0YWxsYXRpb24/X3hfdHJfc2w9ZW4mX3hfdHJfdGw9ZXMmX3hfdHJfaGw9ZXMmX3hfdHJfcHRvPXRjCnRhZ3M6Ci0gcHl0aG9uCi0gbGFyYXZlbAotIGF1dG9tYXRpb24KLSBkZXZvcHMKLSBjYXNvLWRlLXVzbwpza2lsbHNfcmVxdWlyZWQ6Ci0gJ1tbMDFfU2tpbGxzL1NLSUxMXzAwMV9TY3JhcGluZ195X0V4dHJhY2Npb25fV2VifFNjcmFwaW5nIHkgRXh0cmFjY2nDs24gV2ViXV0nCmRlcGVuZGVuY2llczoKLSByZXF1ZXN0cz49Mi4zMS4wCi0gcHlkYW50aWM+PTIuMC4wCmNvbXBsZXhpdHk6IGludGVybWVkaWF0ZQpzZW1hbnRpY19zdW1tYXJ5OiBIZXJyYW1pZW50YSBjb25jZXB0dWFsIHkgZGUgYXV0b21hdGl6YWNpw7NuIHBhcmEgZ2VzdGlvbmFyIGxhIGluc3RhbGFjacOzbiwKICBjb25maWd1cmFjacOzbiB5IGRlc3BsaWVndWUgZGUgcHJveWVjdG9zIGJhc2Fkb3MgZW4gTGFyYXZlbCB1dGlsaXphbmRvIHNjcmlwdHMgZGUKICBjb250cm9sIGVuIFB5dGhvbi4gUGVybWl0ZSB2ZXJpZmljYXIgZGVwZW5kZW5jaWFzIGRlbCBzaXN0ZW1hLCBjb25maWd1cmFyIHZhcmlhYmxlcwogIGRlIGVudG9ybm8geSBvcnF1ZXN0YXIgZGVzcGxpZWd1ZXMgZGUgZm9ybWEgYXV0b21hdGl6YWRhLgotLS0KCiMg8J+SoSBBdXRvbWF0aXphY2nDs24geSBHZXN0acOzbiBkZSBFbnRvcm5vcyBMYXJhdmVsIGVuIFB5dGhvbgoKPiAqKk9yaWdlbjoqKiBbaHR0cHM6Ly9sYXJhdmVsLWNvbS50cmFuc2xhdGUuZ29vZy9mcmFtZXdvcmsvZG9jcy9pbnN0YWxsYXRpb24/X3hfdHJfc2w9ZW4mX3hfdHJfdGw9ZXMmX3hfdHJfaGw9ZXMmX3hfdHJfcHRvPXRjXShodHRwczovL2xhcmF2ZWwtY29tLnRyYW5zbGF0ZS5nb29nL2ZyYW1ld29yay9kb2NzL2luc3RhbGxhdGlvbj9feF90cl9zbD1lbiZfeF90cl90bD1lcyZfeF90cl9obD1lcyZfeF90cl9wdG89dGMpICAKPiAqKkNvbXBsZWppZGFkOioqIGBpbnRlcm1lZGlhdGVgIHwgKipFc3TDoW5kYXI6KiogYE9LRiB2MS4wLjBgCgotLS0KCiMjIPCfk4wgUmVzdW1lbiBDb25jZXB0dWFsIHkgUHJvcMOzc2l0bwpIZXJyYW1pZW50YSBjb25jZXB0dWFsIHkgZGUgYXV0b21hdGl6YWNpw7NuIHBhcmEgZ2VzdGlvbmFyIGxhIGluc3RhbGFjacOzbiwgY29uZmlndXJhY2nDs24geSBkZXNwbGllZ3VlIGRlIHByb3llY3RvcyBiYXNhZG9zIGVuIExhcmF2ZWwgdXRpbGl6YW5kbyBzY3JpcHRzIGRlIGNvbnRyb2wgZW4gUHl0aG9uLiBQZXJtaXRlIHZlcmlmaWNhciBkZXBlbmRlbmNpYXMgZGVsIHNpc3RlbWEsIGNvbmZpZ3VyYXIgdmFyaWFibGVzIGRlIGVudG9ybm8geSBvcnF1ZXN0YXIgZGVzcGxpZWd1ZXMgZGUgZm9ybWEgYXV0b21hdGl6YWRhLgoKYGBgbWVybWFpZApncmFwaCBMUgogICAgSW5wdXRbIkVudHJhZGEgLyBDb25maWd1cmFjacOzbiJdIC0tPiBMb2dpY1siTMOzZ2ljYSBkZSBsYXJhdmVsLWVudmlyb25tZW50LWF1dG9tYXRpb24iXQogICAgTG9naWMgLS0+IE91dHB1dFsiUmVzdWx0YWRvIFZhbGlkYWRvIl0KYGBgCgotLS0KCiMjIPCfm6DvuI8gUmVxdWlzaXRvcyBkZSBJbnN0YWxhY2nDs24KYGBgYmFzaApwaXAgaW5zdGFsbCByZXF1ZXN0cz49Mi4zMS4wIHB5ZGFudGljPj0yLjAuMApgYGAKCi0tLQoKIyMg8J+agCBDYXNvcyBkZSBVc28geSBTY3JpcHRzIE1pbmltYWxpc3RhcwoKIyMjIENhc28gMTogUXVpY2tzdGFydCAvIFZlcmlmaWNhY2nDs24gZGUgUmVxdWlzaXRvcyBkZWwgU2lzdGVtYQoqICoqRXNjZW5hcmlvOioqIFZlcmlmaWNhY2nDs24gZWxlbWVudGFsIGRlIHF1ZSBsYXMgaGVycmFtaWVudGFzIG5lY2VzYXJpYXMgcGFyYSBMYXJhdmVsIChQSFAsIENvbXBvc2VyLCBOb2RlKSBlc3TDoW4gaW5zdGFsYWRhcyBlbiBlbCBzaXN0ZW1hIG9wZXJhdGl2by4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgc3VicHJvY2VzcwppbXBvcnQgc3lzCgpkZWYgY2hlY2tfY29tbWFuZChjb21tYW5kOiBzdHIpIC0+IGJvb2w6CiAgICB0cnk6CiAgICAgICAgcmVzdWx0ID0gc3VicHJvY2Vzcy5ydW4oW2NvbW1hbmQsICctLXZlcnNpb24nXSwgY2FwdHVyZV9vdXRwdXQ9VHJ1ZSwgdGV4dD1UcnVlLCBjaGVjaz1UcnVlKQogICAgICAgIHByaW50KGYie2NvbW1hbmR9IGlzIGluc3RhbGxlZDoge3Jlc3VsdC5zdGRvdXQuc3RyaXAoKX0iKQogICAgICAgIHJldHVybiBUcnVlCiAgICBleGNlcHQgKHN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yLCBGaWxlTm90Rm91bmRFcnJvcik6CiAgICAgICAgcHJpbnQoZiJ7Y29tbWFuZH0gaXMgTk9UIGluc3RhbGxlZC4iKQogICAgICAgIHJldHVybiBGYWxzZQoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIHRvb2xzID0gWydwaHAnLCAnY29tcG9zZXInLCAnbnBtJ10KICAgIHN0YXR1cyA9IHt0b29sOiBjaGVja19jb21tYW5kKHRvb2wpIGZvciB0b29sIGluIHRvb2xzfQogICAgaWYgbm90IGFsbChzdGF0dXMudmFsdWVzKCkpOgogICAgICAgIHN5cy5leGl0KDEpCmBgYAoKLS0tCgojIyMgQ2FzbyAyOiBNYW5lam8gZGUgRXJyb3JlcyB5IEdlbmVyYWNpw7NuIGRlIEVudG9ybm8gLmVudgoqICoqRXNjZW5hcmlvOioqIENyZWFjacOzbiBhdXRvbcOhdGljYSBkZWwgYXJjaGl2byAuZW52IGEgcGFydGlyIGRlIC5lbnYuZXhhbXBsZSBjb24gdmFsaWRhY2nDs24gZGUgZXJyb3JlcyBhbnRlIGxhIGF1c2VuY2lhIGRlIGFyY2hpdm9zIGRlIGNvbmZpZ3VyYWNpw7NuIGJhc2UuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IG9zCmltcG9ydCBzaHV0aWwKaW1wb3J0IHN5cwoKZGVmIGluaXRpYWxpemVfZW52aXJvbm1lbnQoYmFzZV9wYXRoOiBzdHIpIC0+IE5vbmU6CiAgICBlbnZfZXhhbXBsZSA9IG9zLnBhdGguam9pbihiYXNlX3BhdGgsICcuZW52LmV4YW1wbGUnKQogICAgZW52X2ZpbGUgPSBvcy5wYXRoLmpvaW4oYmFzZV9wYXRoLCAnLmVudicpCgogICAgaWYgbm90IG9zLnBhdGguZXhpc3RzKGVudl9leGFtcGxlKToKICAgICAgICBwcmludChmIkVycm9yIGNyw610aWNvOiBObyBzZSBlbmN1ZW50cmEge2Vudl9leGFtcGxlfSIsIGZpbGU9c3lzLnN0ZGVycikKICAgICAgICBzeXMuZXhpdCgxKQoKICAgIGlmIG9zLnBhdGguZXhpc3RzKGVudl9maWxlKToKICAgICAgICBwcmludCgiRWwgYXJjaGl2byAuZW52IHlhIGV4aXN0ZS4gT21pdGllbmRvIGNvcGlhLiIpCiAgICAgICAgcmV0dXJuCgogICAgdHJ5OgogICAgICAgIHNodXRpbC5jb3B5KGVudl9leGFtcGxlLCBlbnZfZmlsZSkKICAgICAgICBwcmludCgiQXJjaGl2byAuZW52IGdlbmVyYWRvIGV4aXRvc2FtZW50ZSBkZXNkZSAuZW52LmV4YW1wbGUuIikKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICBwcmludChmIkZhbGxvIGFsIGdlbmVyYXIgZWwgYXJjaGl2byAuZW52OiB7ZX0iLCBmaWxlPXN5cy5zdGRlcnIpCiAgICAgICAgc3lzLmV4aXQoMSkKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBpbml0aWFsaXplX2Vudmlyb25tZW50KCIuIikKYGBgCgotLS0KCiMjIyBDYXNvIDM6IFBhdHLDs24gZGUgUHJvZHVjY2nDs24gLyBQaXBlbGluZSBkZSBJbnN0YWxhY2nDs24gUmVzaWxpZW50ZQoqICoqRXNjZW5hcmlvOioqIE9ycXVlc3RhY2nDs24gY29tcGxldGEgeSByZXNpbGllbnRlIGRlbCBkZXNwbGllZ3VlIHkgY29uZmlndXJhY2nDs24gZGUgZGVwZW5kZW5jaWFzIGRlIExhcmF2ZWwgY29uIHJlaW50ZW50b3MgeSBsb2dnaW5nIGVzdHJ1Y3R1cmFkby4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgc3VicHJvY2VzcwppbXBvcnQgbG9nZ2luZwppbXBvcnQgc3lzCgpsb2dnaW5nLmJhc2ljQ29uZmlnKGxldmVsPWxvZ2dpbmcuSU5GTywgZm9ybWF0PSclKGFzY3RpbWUpcyAtICUobGV2ZWxuYW1lKXMgLSAlKG1lc3NhZ2UpcycpCgpkZWYgcnVuX3N0ZXAoZGVzY3JpcHRpb246IHN0ciwgY29tbWFuZDogbGlzdFtzdHJdKSAtPiBOb25lOgogICAgbG9nZ2luZy5pbmZvKGYiSW5pY2lhbmRvOiB7ZGVzY3JpcHRpb259IikKICAgIHRyeToKICAgICAgICByZXN1bHQgPSBzdWJwcm9jZXNzLnJ1bihjb21tYW5kLCBjYXB0dXJlX291dHB1dD1UcnVlLCB0ZXh0PVRydWUsIGNoZWNrPVRydWUpCiAgICAgICAgbG9nZ2luZy5pbmZvKGYiQ29tcGxldGFkbzoge2Rlc2NyaXB0aW9ufVxue3Jlc3VsdC5zdGRvdXQuc3RyaXAoKX0iKQogICAgZXhjZXB0IHN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yIGFzIGU6CiAgICAgICAgbG9nZ2luZy5lcnJvcihmIkZhbGxvIGVuICd7ZGVzY3JpcHRpb259Jzoge2Uuc3RkZXJyLnN0cmlwKCl9IikKICAgICAgICBzeXMuZXhpdCgxKQoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIHN0ZXBzID0gWwogICAgICAgICgiSW5zdGFsYWNpw7NuIGRlIGRlcGVuZGVuY2lhcyBQSFAiLCBbImNvbXBvc2VyIiwgImluc3RhbGwiLCAiLS1uby1pbnRlcmFjdGlvbiIsICItLXByZWZlci1kaXN0IiwgIi0tb3B0aW1pemUtYXV0b2xvYWRlciJdKSwKICAgICAgICAoIkdlbmVyYWNpw7NuIGRlIGxsYXZlIGRlIGFwbGljYWNpw7NuIiwgWyJwaHAiLCAiYXJ0aXNhbiIsICJrZXk6Z2VuZXJhdGUiXSksCiAgICAgICAgKCJNaWdyYWNpw7NuIGRlIGJhc2UgZGUgZGF0b3MiLCBbInBocCIsICJhcnRpc2FuIiwgIm1pZ3JhdGUiLCAiLS1mb3JjZSJdKQogICAgXQogICAgCiAgICBmb3IgZGVzYywgY21kIGluIHN0ZXBzOgogICAgICAgIHJ1bl9zdGVwKGRlc2MsIGNtZCkKICAgIAogICAgbG9nZ2luZy5pbmZvKCJQaXBlbGluZSBkZSBpbnN0YWxhY2nDs24gZGUgTGFyYXZlbCBmaW5hbGl6YWRvIGNvbiDDqXhpdG8uIikKYGBgCgotLS0KCgojIyDimqDvuI8gQ29uc2lkZXJhY2lvbmVzIFTDqWNuaWNhcyB5IEdvdGNoYXMKKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIFZhbGlkYXIgc2llbXByZSBsYSBkaXNwb25pYmlsaWRhZCBkZSBlamVjdXRhYmxlcyBleHRlcm5vcyAoUEhQLCBDb21wb3NlcikgYW50ZXMgZGUgaW52b2NhciBjb21hbmRvcyBkZSBpbnN0YWxhY2nDs24uCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBBc2VndXJhciBxdWUgbGFzIHZhcmlhYmxlcyBkZSBlbnRvcm5vIGNyw610aWNhcyBjb21vIEFQUF9LRVkgbm8gc2Ugc29icmVzY3JpYmFuIHNpIHlhIGVzdMOhbiBjb25maWd1cmFkYXMgZW4gcHJvZHVjY2nDs24uCiogKipHb3RjaGEvQWxlcnRhOioqIEFzdW1pciBxdWUgUEhQIHkgQ29tcG9zZXIgZXN0w6FuIGRpc3BvbmlibGVzIGVuIGVsIFBBVEggZ2xvYmFsIHNpbiByZWFsaXphciB1bmEgdmFsaWRhY2nDs24gcHJldmlhLgoqICoqR290Y2hhL0FsZXJ0YToqKiBTb2JyZXNjcmliaXIgYXJjaGl2b3MgLmVudiBleGlzdGVudGVzIGVuIGRlc3BsaWVndWVzIGF1dG9tYXRpemFkb3MgZGVzdHJ1eWVuZG8gY29uZmlndXJhY2lvbmVzIGRlIHByb2R1Y2Npw7NuLgoKLS0tCgojIyDwn5SXIE5vZG9zIFJlbGFjaW9uYWRvcyBlbiBlbCBHcmFmbwoqIFtbMDFfU2tpbGxzL1NLSUxMXzAwMV9TY3JhcGluZ195X0V4dHJhY2Npb25fV2VifEhhYmlsaWRhZCBUw6ljbmljYTogU2NyYXBpbmcgeSBFeHRyYWNjacOzbiBXZWJdXQoqIFtbMDNfUHJveWVjdG9zL1BST0pfMDAxX0FnZW50ZV9TY3JhcGVyfFByb3llY3RvOiBBZ2VudGUgU2NyYXBlcl1dCg==" download="CU_040_laravel-environment-automation.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Técnico de la Documentación</h2>
+            <p>Herramienta conceptual y de automatización para gestionar la instalación, configuración y despliegue de proyectos basados en Laravel utilizando scripts de control en Python. Permite verificar dependencias del sistema, configurar variables de entorno y orquestar despliegues de forma automatizada.</p>
+            <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #94a3b8;">
+                🔗 <strong>Fuente:</strong> <a href="https://laravel-com.translate.goog/framework/docs/installation?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc" target="_blank" style="color: #818cf8; text-decoration: underline;">https://laravel-com.translate.goog/framework/docs/installation?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc</a>
+            </div>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Quickstart / Verificación de Requisitos del Sistema</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Verificación elemental de que las herramientas necesarias para Laravel (PHP, Composer, Node) están instaladas en el sistema operativo.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import subprocess
+import sys
+
+def check_command(command: str) -&gt; bool:
+    try:
+        result = subprocess.run([command, '--version'], capture_output=True, text=True, check=True)
+        print(f"{command} is installed: {result.stdout.strip()}")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print(f"{command} is NOT installed.")
+        return False
+
+if __name__ == "__main__":
+    tools = ['php', 'composer', 'npm']
+    status = {tool: check_command(tool) for tool in tools}
+    if not all(status.values()):
+        sys.exit(1)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Manejo de Errores y Generación de Entorno .env</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Creación automática del archivo .env a partir de .env.example con validación de errores ante la ausencia de archivos de configuración base.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import os
+import shutil
+import sys
+
+def initialize_environment(base_path: str) -&gt; None:
+    env_example = os.path.join(base_path, '.env.example')
+    env_file = os.path.join(base_path, '.env')
+
+    if not os.path.exists(env_example):
+        print(f"Error crítico: No se encuentra {env_example}", file=sys.stderr)
+        sys.exit(1)
+
+    if os.path.exists(env_file):
+        print("El archivo .env ya existe. Omitiendo copia.")
+        return
+
+    try:
+        shutil.copy(env_example, env_file)
+        print("Archivo .env generado exitosamente desde .env.example.")
+    except Exception as e:
+        print(f"Fallo al generar el archivo .env: {e}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    initialize_environment(".")</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Producción / Pipeline de Instalación Resiliente</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Orquestación completa y resiliente del despliegue y configuración de dependencias de Laravel con reintentos y logging estructurado.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import subprocess
+import logging
+import sys
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def run_step(description: str, command: list[str]) -&gt; None:
+    logging.info(f"Iniciando: {description}")
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+        logging.info(f"Completado: {description}\n{result.stdout.strip()}")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Fallo en '{description}': {e.stderr.strip()}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    steps = [
+        ("Instalación de dependencias PHP", ["composer", "install", "--no-interaction", "--prefer-dist", "--optimize-autoloader"]),
+        ("Generación de llave de aplicación", ["php", "artisan", "key:generate"]),
+        ("Migración de base de datos", ["php", "artisan", "migrate", "--force"])
+    ]
+    
+    for desc, cmd in steps:
+        run_step(desc, cmd)
+    
+    logging.info("Pipeline de instalación de Laravel finalizado con éxito.")</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Validar siempre la disponibilidad de ejecutables externos (PHP, Composer) antes de invocar comandos de instalación.</li><li>✅ <strong>Práctica:</strong> Asegurar que las variables de entorno críticas como APP_KEY no se sobrescriban si ya están configuradas en producción.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> Asumir que PHP y Composer están disponibles en el PATH global sin realizar una validación previa.</li><li>⚠️ <strong>Alerta:</strong> Sobrescribir archivos .env existentes en despliegues automatizados destruyendo configuraciones de producción.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

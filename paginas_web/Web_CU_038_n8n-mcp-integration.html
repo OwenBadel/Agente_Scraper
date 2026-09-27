@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatización de Workflows e Integración MCP con n8n — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Automatización de Workflows e Integración MCP con n8n</h1>
+            <p>Documentación técnica analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <strong>Documentación Oficial:</strong> <a href="https://docs.n8n.io/" target="_blank" style="color: #79f2f0; text-decoration: underline; font-family: monospace;">https://docs.n8n.io/ ↗</a></span>
+                <span>📦 Dependencias: <code>requests>=2.31.0 pydantic>=2.0.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#n8n</span><span class="tag">#mcp</span><span class="tag">#automation</span><span class="tag">#ai-agents</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0 (Obsidian)</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMzgtTjhOLU1DUC1JTlRFR1JBVElPTgp0aXRsZTogQXV0b21hdGl6YWNpw7NuIGRlIFdvcmtmbG93cyBlIEludGVncmFjacOzbiBNQ1AgY29uIG44bgp0eXBlOiB1c2UtY2FzZQp2ZXJzaW9uOiAxLjAuMApzdGF0dXM6IGFjdGl2ZQpjcmVhdGVkX2F0OiAnMjAyNi0wOS0wM1QxNzo1Nzo0NC41NTgyNDktMDU6MDAnCnVwZGF0ZWRfYXQ6ICcyMDI2LTA5LTAzVDE3OjU3OjQ0LjU1ODI0OS0wNTowMCcKc291cmNlX3VybDogaHR0cHM6Ly9kb2NzLm44bi5pby8KdGFnczoKLSBweXRob24KLSBuOG4KLSBtY3AKLSBhdXRvbWF0aW9uCi0gYWktYWdlbnRzCi0gY2Fzby1kZS11c28Kc2tpbGxzX3JlcXVpcmVkOgotIFNLSUxMLTAwMS1TQ1JBUElORy1FWFRSQUNDSU9OLVdFQgotIFNLSUxMLTAwMi1HRU1JTkktTVVMVElNT0RBTApkZXBlbmRlbmNpZXM6Ci0gcmVxdWVzdHM+PTIuMzEuMAotIHB5ZGFudGljPj0yLjAuMApjb21wbGV4aXR5OiBpbnRlcm1lZGlhdGUKc2VtYW50aWNfc3VtbWFyeTogbjhuIGVzIHVuYSBoZXJyYW1pZW50YSBkZSBhdXRvbWF0aXphY2nDs24gZGUgZmx1am9zIGRlIHRyYWJham8gZGUKICBjw7NkaWdvIGFiaWVydG8gcXVlIGNvbWJpbmEgY2FwYWNpZGFkZXMgZGUgSUEgY29uIHByb2Nlc29zIGRlIG5lZ29jaW8uIFBlcm1pdGUgY29uZWN0YXIKICBzZXJ2aWRvcmVzIE1vZGVsIENvbnRleHQgUHJvdG9jb2wgKE1DUCkgY29uIGFzaXN0ZW50ZXMgYXZhbnphZG9zIGNvbW8gQ2xhdWRlIHkgT3BlbkFJLAogIGZhY2lsaXRhbmRvIGxhIGNyZWFjacOzbiBkZSBlbmRwb2ludHMgQVBJLCBhZ2VudGVzIGRlIElBIGNvbnZlcnNhY2lvbmFsZXMgeSBwcm9jZXNhbWllbnRvCiAgbWFzaXZvIGRlIGRhdG9zIG1lZGlhbnRlIHVuYSBhcnF1aXRlY3R1cmEgZXh0ZW5zaWJsZS4KLS0tCgojIPCfkqEgQXV0b21hdGl6YWNpw7NuIGRlIFdvcmtmbG93cyBlIEludGVncmFjacOzbiBNQ1AgY29uIG44bgoKPiAqKk9yaWdlbjoqKiBbaHR0cHM6Ly9kb2NzLm44bi5pby9dKGh0dHBzOi8vZG9jcy5uOG4uaW8vKSAgCj4gKipDb21wbGVqaWRhZDoqKiBgaW50ZXJtZWRpYXRlYCB8ICoqRXN0w6FuZGFyOioqIGBPS0YgdjEuMC4wYAoKLS0tCgojIyDwn5OMIFJlc3VtZW4gQ29uY2VwdHVhbCB5IFByb3DDs3NpdG8KbjhuIGVzIHVuYSBoZXJyYW1pZW50YSBkZSBhdXRvbWF0aXphY2nDs24gZGUgZmx1am9zIGRlIHRyYWJham8gZGUgY8OzZGlnbyBhYmllcnRvIHF1ZSBjb21iaW5hIGNhcGFjaWRhZGVzIGRlIElBIGNvbiBwcm9jZXNvcyBkZSBuZWdvY2lvLiBQZXJtaXRlIGNvbmVjdGFyIHNlcnZpZG9yZXMgTW9kZWwgQ29udGV4dCBQcm90b2NvbCAoTUNQKSBjb24gYXNpc3RlbnRlcyBhdmFuemFkb3MgY29tbyBDbGF1ZGUgeSBPcGVuQUksIGZhY2lsaXRhbmRvIGxhIGNyZWFjacOzbiBkZSBlbmRwb2ludHMgQVBJLCBhZ2VudGVzIGRlIElBIGNvbnZlcnNhY2lvbmFsZXMgeSBwcm9jZXNhbWllbnRvIG1hc2l2byBkZSBkYXRvcyBtZWRpYW50ZSB1bmEgYXJxdWl0ZWN0dXJhIGV4dGVuc2libGUuCgpgYGBtZXJtYWlkCmdyYXBoIExSCiAgICBJbnB1dFsiRW50cmFkYSAvIENvbmZpZ3VyYWNpw7NuIl0gLS0+IExvZ2ljWyJMw7NnaWNhIGRlIG44bi1tY3AtaW50ZWdyYXRpb24iXQogICAgTG9naWMgLS0+IE91dHB1dFsiUmVzdWx0YWRvIFZhbGlkYWRvIl0KYGBgCgotLS0KCiMjIPCfm6DvuI8gUmVxdWlzaXRvcyBkZSBJbnN0YWxhY2nDs24KYGBgYmFzaApwaXAgaW5zdGFsbCByZXF1ZXN0cz49Mi4zMS4wIHB5ZGFudGljPj0yLjAuMApgYGAKCi0tLQoKIyMg8J+agCBDYXNvcyBkZSBVc28geSBTY3JpcHRzIE1pbmltYWxpc3RhcwoKIyMjIENhc28gMTogUXVpY2tzdGFydCAvIENvbmV4acOzbiBCw6FzaWNhIGEgU2Vydmlkb3IgbjhuIE1DUAoqICoqRXNjZW5hcmlvOioqIEVzdGFibGVjZXIgbGEgY29tdW5pY2FjacOzbiBpbmljaWFsIGNvbiB1biBzZXJ2aWRvciBNQ1AgZGUgbjhuIG1lZGlhbnRlIHBldGljaW9uZXMgSFRUUCBwYXJhIHZlcmlmaWNhciBlbCBlc3RhZG8gZGVsIG5vZG8geSBsaXN0YXIgbGFzIGhlcnJhbWllbnRhcyBkaXNwb25pYmxlcy4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgcmVxdWVzdHMKCmRlZiBjaGVja19uOG5fbWNwX2hlYWx0aChiYXNlX3VybDogc3RyKSAtPiBkaWN0OgogICAgZW5kcG9pbnQgPSBmIntiYXNlX3VybH0vaGVhbHRoIgogICAgdHJ5OgogICAgICAgIHJlc3BvbnNlID0gcmVxdWVzdHMuZ2V0KGVuZHBvaW50LCB0aW1lb3V0PTUpCiAgICAgICAgcmVzcG9uc2UucmFpc2VfZm9yX3N0YXR1cygpCiAgICAgICAgcmV0dXJuIHsic3RhdHVzIjogInN1Y2Nlc3MiLCAiZGF0YSI6IHJlc3BvbnNlLmpzb24oKX0KICAgIGV4Y2VwdCByZXF1ZXN0cy5leGNlcHRpb25zLlJlcXVlc3RFeGNlcHRpb24gYXMgZToKICAgICAgICByZXR1cm4geyJzdGF0dXMiOiAiZXJyb3IiLCAibWVzc2FnZSI6IHN0cihlKX0KCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBzZXJ2ZXJfdXJsID0gImh0dHBzOi8vbjhuLXNlcnZlci5sb2NhbC9tY3Atc2VydmVyL2h0dHAiCiAgICByZXN1bHQgPSBjaGVja19uOG5fbWNwX2hlYWx0aChzZXJ2ZXJfdXJsKQogICAgcHJpbnQocmVzdWx0KQpgYGAKCi0tLQoKIyMjIENhc28gMjogTWFuZWpvIGRlIEVycm9yZXMgeSBSZWludGVudG9zIGVuIExsYW1hZGFzIGEgV29ya2Zsb3dzCiogKipFc2NlbmFyaW86KiogSW1wbGVtZW50YXIgdW4gbWVjYW5pc21vIHJvYnVzdG8gY29uIHJlaW50ZW50b3MgYXV0b23DoXRpY29zIHBhcmEgaW52b2NhciB3ZWJob29rcyBkZSBuOG4gYW50ZSBmYWxsYXMgdGVtcG9yYWxlcyBkZSByZWQgbyBsYXRlbmNpYSBlbGV2YWRhLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmltcG9ydCB0aW1lCmltcG9ydCByZXF1ZXN0cwpmcm9tIHJlcXVlc3RzLmFkYXB0ZXJzIGltcG9ydCBIVFRQQWRhcHRlcgpmcm9tIHVybGxpYjMudXRpbC5yZXRyeSBpbXBvcnQgUmV0cnkKCmRlZiBpbnZva2VfbjhuX3dvcmtmbG93X3dpdGhfcmV0cnkod2ViaG9va191cmw6IHN0ciwgcGF5bG9hZDogZGljdCkgLT4gZGljdDoKICAgIHNlc3Npb24gPSByZXF1ZXN0cy5TZXNzaW9uKCkKICAgIHJldHJpZXMgPSBSZXRyeSh0b3RhbD0zLCBiYWNrb2ZmX2ZhY3Rvcj0xLCBzdGF0dXNfZm9yY2VsaXN0PVs1MDAsIDUwMiwgNTAzLCA1MDRdKQogICAgc2Vzc2lvbi5tb3VudCgiaHR0cHM6Ly8iLCBIVFRQQWRhcHRlcihtYXhfcmV0cmllcz1yZXRyaWVzKSkKICAgIAogICAgdHJ5OgogICAgICAgIHJlc3BvbnNlID0gc2Vzc2lvbi5wb3N0KHdlYmhvb2tfdXJsLCBqc29uPXBheWxvYWQsIHRpbWVvdXQ9MTApCiAgICAgICAgcmVzcG9uc2UucmFpc2VfZm9yX3N0YXR1cygpCiAgICAgICAgcmV0dXJuIHJlc3BvbnNlLmpzb24oKQogICAgZXhjZXB0IHJlcXVlc3RzLmV4Y2VwdGlvbnMuUmVxdWVzdEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHJldHVybiB7ImVycm9yIjogVHJ1ZSwgImRldGFpbHMiOiBzdHIoZSl9CgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgdXJsID0gImh0dHBzOi8vbjhuLXNlcnZlci5sb2NhbC93ZWJob29rL3Byb2Nlc3MtZGF0YSIKICAgIHJlcyA9IGludm9rZV9uOG5fd29ya2Zsb3dfd2l0aF9yZXRyeSh1cmwsIHsidXNlcl9pZCI6IDQyLCAiYWN0aW9uIjogInN5bmMifSkKICAgIHByaW50KHJlcykKYGBgCgotLS0KCiMjIyBDYXNvIDM6IFBhdHLDs24gZGUgUHJvZHVjY2nDs24gLyBDbGllbnRlIEFzw61uY3Jvbm8gUmVzaWxpZW50ZSBwYXJhIE1DUAoqICoqRXNjZW5hcmlvOioqIENyZWFjacOzbiBkZSB1biBjbGllbnRlIGFzw61uY3Jvbm8geSB0aXBhZG8gdXRpbGl6YW5kbyBQeWRhbnRpYyB5IGh0dHB4IHBhcmEgaW50ZXJhY3R1YXIgZGUgZm9ybWEgY29uY3VycmVudGUgY29uIG3Dumx0aXBsZXMgZW5kcG9pbnRzIGRlIG44biB5IGFnZW50ZXMgZGUgSUEuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IGFzeW5jaW8KaW1wb3J0IGh0dHB4CmZyb20gcHlkYW50aWMgaW1wb3J0IEJhc2VNb2RlbCwgSHR0cFVybAoKY2xhc3MgTUNQUmVxdWVzdChCYXNlTW9kZWwpOgogICAgc2VydmVyX3VybDogSHR0cFVybAogICAgdG9vbF9uYW1lOiBzdHIKICAgIGFyZ3VtZW50czogZGljdAoKYXN5bmMgZGVmIGNhbGxfbjhuX21jcF90b29sKGNsaWVudDogaHR0cHguQXN5bmNDbGllbnQsIHJlcTogTUNQUmVxdWVzdCkgLT4gZGljdDoKICAgIHVybCA9IGYie3JlcS5zZXJ2ZXJfdXJsfS90b29scy97cmVxLnRvb2xfbmFtZX0iCiAgICB0cnk6CiAgICAgICAgcmVzcG9uc2UgPSBhd2FpdCBjbGllbnQucG9zdChzdHIodXJsKSwganNvbj1yZXEuYXJndW1lbnRzLCB0aW1lb3V0PTE1LjApCiAgICAgICAgcmVzcG9uc2UucmFpc2VfZm9yX3N0YXR1cygpCiAgICAgICAgcmV0dXJuIHsidG9vbCI6IHJlcS50b29sX25hbWUsICJyZXN1bHQiOiByZXNwb25zZS5qc29uKCl9CiAgICBleGNlcHQgaHR0cHguSFRUUFN0YXR1c0Vycm9yIGFzIGU6CiAgICAgICAgcmV0dXJuIHsidG9vbCI6IHJlcS50b29sX25hbWUsICJlcnJvciI6IGYiSFRUUCBlcnJvcjoge2UucmVzcG9uc2Uuc3RhdHVzX2NvZGV9In0KICAgIGV4Y2VwdCBodHRweC5SZXF1ZXN0RXJyb3IgYXMgZToKICAgICAgICByZXR1cm4geyJ0b29sIjogcmVxLnRvb2xfbmFtZSwgImVycm9yIjogZiJDb25uZWN0aW9uIGVycm9yOiB7c3RyKGUpfSJ9Cgphc3luYyBkZWYgbWFpbigpOgogICAgYXN5bmMgd2l0aCBodHRweC5Bc3luY0NsaWVudCgpIGFzIGNsaWVudDoKICAgICAgICByZXF1ZXN0X2RhdGEgPSBNQ1BSZXF1ZXN0KAogICAgICAgICAgICBzZXJ2ZXJfdXJsPSJodHRwczovL244bi1zZXJ2ZXIubG9jYWwvbWNwLXNlcnZlci9odHRwIiwKICAgICAgICAgICAgdG9vbF9uYW1lPSJzdW1tYXJpemVfdGV4dCIsCiAgICAgICAgICAgIGFyZ3VtZW50cz17InRleHQiOiAiQXV0b21hdGl6YWNpw7NuIGF2YW56YWRhIGNvbiBuOG4geSBQeXRob24uIn0KICAgICAgICApCiAgICAgICAgcmVzdWx0ID0gYXdhaXQgY2FsbF9uOG5fbWNwX3Rvb2woY2xpZW50LCByZXF1ZXN0X2RhdGEpCiAgICAgICAgcHJpbnQocmVzdWx0KQoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIGFzeW5jaW8ucnVuKG1haW4oKSkKYGBgCgotLS0KCgojIyDimqDvuI8gQ29uc2lkZXJhY2lvbmVzIFTDqWNuaWNhcyB5IEdvdGNoYXMKKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIFZhbGlkYXIgc2llbXByZSBsYXMgY2FyZ2FzIMO6dGlsZXMgKHBheWxvYWRzKSB1dGlsaXphbmRvIGVzcXVlbWFzIGVzdHJpY3RvcyBjb21vIFB5ZGFudGljIGFudGVzIGRlIGVudmlhcmxhcyBhIGxvcyB3ZWJob29rcyBkZSBuOG4uCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBDb25maWd1cmFyIHRpZW1wb3MgZGUgZXNwZXJhICh0aW1lb3V0cykgYWRlY3VhZG9zIGVuIHRvZGFzIGxhcyBwZXRpY2lvbmVzIEhUVFAgcGFyYSBldml0YXIgYmxvcXVlb3MgZW4gbG9zIGhpbG9zIGRlIGVqZWN1Y2nDs24uCiogKipHb3RjaGEvQWxlcnRhOioqIE5vIG1hbmVqYXIgYWRlY3VhZGFtZW50ZSBsb3MgY8OzZGlnb3MgZGUgZXN0YWRvIEhUVFAgZGV2dWVsdG9zIHBvciBsb3Mgbm9kb3MgZGUgZXJyb3IgZW4gbjhuLgoqICoqR290Y2hhL0FsZXJ0YToqKiBFeHBvbmVyIFVSTHMgZGUgd2ViaG9va3MgbyBzZXJ2aWRvcmVzIE1DUCBzaW4gYXV0ZW50aWNhY2nDs24gbmkgY2FiZWNlcmFzIGRlIGF1dG9yaXphY2nDs24gZmlybWFkYXMuCgotLS0KCiMjIPCflJcgTm9kb3MgUmVsYWNpb25hZG9zIGVuIGVsIEdyYWZvCiogW1swMV9Ta2lsbHMvU0tJTExfMDAxX1NjcmFwaW5nX3lfRXh0cmFjY2lvbl9XZWJ8SGFiaWxpZGFkIFTDqWNuaWNhOiBTY3JhcGluZyB5IEV4dHJhY2Npw7NuIFdlYl1dCiogW1swM19Qcm95ZWN0b3MvUFJPSl8wMDFfQWdlbnRlX1NjcmFwZXJ8UHJveWVjdG86IEFnZW50ZSBTY3JhcGVyXV0K" download="CU_038_n8n-mcp-integration.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Técnico de la Documentación</h2>
+            <p>n8n es una herramienta de automatización de flujos de trabajo de código abierto que combina capacidades de IA con procesos de negocio. Permite conectar servidores Model Context Protocol (MCP) con asistentes avanzados como Claude y OpenAI, facilitando la creación de endpoints API, agentes de IA conversacionales y procesamiento masivo de datos mediante una arquitectura extensible.</p>
+            <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #94a3b8;">
+                🔗 <strong>Fuente:</strong> <a href="https://docs.n8n.io/" target="_blank" style="color: #818cf8; text-decoration: underline;">https://docs.n8n.io/</a>
+            </div>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Quickstart / Conexión Básica a Servidor n8n MCP</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Establecer la comunicación inicial con un servidor MCP de n8n mediante peticiones HTTP para verificar el estado del nodo y listar las herramientas disponibles.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import requests
+
+def check_n8n_mcp_health(base_url: str) -&gt; dict:
+    endpoint = f"{base_url}/health"
+    try:
+        response = requests.get(endpoint, timeout=5)
+        response.raise_for_status()
+        return {"status": "success", "data": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "message": str(e)}
+
+if __name__ == "__main__":
+    server_url = "https://n8n-server.local/mcp-server/http"
+    result = check_n8n_mcp_health(server_url)
+    print(result)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Manejo de Errores y Reintentos en Llamadas a Workflows</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementar un mecanismo robusto con reintentos automáticos para invocar webhooks de n8n ante fallas temporales de red o latencia elevada.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+def invoke_n8n_workflow_with_retry(webhook_url: str, payload: dict) -&gt; dict:
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+    
+    try:
+        response = session.post(webhook_url, json=payload, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return {"error": True, "details": str(e)}
+
+if __name__ == "__main__":
+    url = "https://n8n-server.local/webhook/process-data"
+    res = invoke_n8n_workflow_with_retry(url, {"user_id": 42, "action": "sync"})
+    print(res)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Producción / Cliente Asíncrono Resiliente para MCP</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Creación de un cliente asíncrono y tipado utilizando Pydantic y httpx para interactuar de forma concurrente con múltiples endpoints de n8n y agentes de IA.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import asyncio
+import httpx
+from pydantic import BaseModel, HttpUrl
+
+class MCPRequest(BaseModel):
+    server_url: HttpUrl
+    tool_name: str
+    arguments: dict
+
+async def call_n8n_mcp_tool(client: httpx.AsyncClient, req: MCPRequest) -&gt; dict:
+    url = f"{req.server_url}/tools/{req.tool_name}"
+    try:
+        response = await client.post(str(url), json=req.arguments, timeout=15.0)
+        response.raise_for_status()
+        return {"tool": req.tool_name, "result": response.json()}
+    except httpx.HTTPStatusError as e:
+        return {"tool": req.tool_name, "error": f"HTTP error: {e.response.status_code}"}
+    except httpx.RequestError as e:
+        return {"tool": req.tool_name, "error": f"Connection error: {str(e)}"}
+
+async def main():
+    async with httpx.AsyncClient() as client:
+        request_data = MCPRequest(
+            server_url="https://n8n-server.local/mcp-server/http",
+            tool_name="summarize_text",
+            arguments={"text": "Automatización avanzada con n8n y Python."}
+        )
+        result = await call_n8n_mcp_tool(client, request_data)
+        print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Validar siempre las cargas útiles (payloads) utilizando esquemas estrictos como Pydantic antes de enviarlas a los webhooks de n8n.</li><li>✅ <strong>Práctica:</strong> Configurar tiempos de espera (timeouts) adecuados en todas las peticiones HTTP para evitar bloqueos en los hilos de ejecución.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> No manejar adecuadamente los códigos de estado HTTP devueltos por los nodos de error en n8n.</li><li>⚠️ <strong>Alerta:</strong> Exponer URLs de webhooks o servidores MCP sin autenticación ni cabeceras de autorización firmadas.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Avanzada y Consultas SQL en PostgreSQL con Psycopg — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Gestión Avanzada y Consultas SQL en PostgreSQL con Psycopg</h1>
+            <p>Documentación analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">advanced</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>psycopg[binary]>=3.1.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#postgresql</span><span class="tag">#sql</span><span class="tag">#psycopg</span><span class="tag">#database</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMjItUE9TVEdSRVNRTC1TUUwtTEFOR1VBR0UtUFNZQ09QRwp0aXRsZTogR2VzdGnDs24gQXZhbnphZGEgeSBDb25zdWx0YXMgU1FMIGVuIFBvc3RncmVTUUwgY29uIFBzeWNvcGcKdHlwZTogdXNlLWNhc2UKdmVyc2lvbjogMS4wLjAKc3RhdHVzOiBhY3RpdmUKY3JlYXRlZF9hdDogJzIwMjYtMDgtMjlUMjA6MTU6MTkuMDU4MjI4LTA1OjAwJwp1cGRhdGVkX2F0OiAnMjAyNi0wOC0yOVQyMDoxNToxOS4wNTgyMjgtMDU6MDAnCnNvdXJjZV91cmw6IGh0dHBzOi8vd3d3LnBvc3RncmVzcWwub3JnL2RvY3MvY3VycmVudC9zcWwuaHRtbAp0YWdzOgotIHB5dGhvbgotIHBvc3RncmVzcWwKLSBzcWwKLSBwc3ljb3BnCi0gZGF0YWJhc2UKLSBjYXNvLWRlLXVzbwpza2lsbHNfcmVxdWlyZWQ6Ci0gMDFfU2tpbGxzL1NLSUxMXzAwMV9TQ1JBUElOR19FWFRSQUNDSU9OX1dFQgpkZXBlbmRlbmNpZXM6Ci0gcHN5Y29wZ1tiaW5hcnldPj0zLjEuMApjb21wbGV4aXR5OiBhZHZhbmNlZApzZW1hbnRpY19zdW1tYXJ5OiBFc3RlIGRvY3VtZW50byBleHBsb3JhIGxvcyBmdW5kYW1lbnRvcyB5IGNhcGFjaWRhZGVzIGF2YW56YWRhcyBkZWwKICBsZW5ndWFqZSBTUUwgZW4gUG9zdGdyZVNRTCwgYWJhcmNhbmRvIGRlc2RlIGxhIGRlZmluaWNpw7NuIGRlIGRhdG9zIChEREwpIHkgbWFuaXB1bGFjacOzbgogIChETUwpIGhhc3RhIGNvbnN1bHRhcyBjb21wbGVqYXMsIMOtbmRpY2VzIHkgY29uY3VycmVuY2lhLiBTZSBpbXBsZW1lbnRhbiBjYXNvcyBwcsOhY3RpY29zCiAgZW4gUHl0aG9uIHV0aWxpemFuZG8gcHN5Y29wZyBwYXJhIGNvbmVjdGFyLCBtYW5pcHVsYXIgZXNxdWVtYXMgeSBlamVjdXRhciBjb25zdWx0YXMKICBkZSBtYW5lcmEgZWZpY2llbnRlLgotLS0KCiMg8J+SoSBHZXN0acOzbiBBdmFuemFkYSB5IENvbnN1bHRhcyBTUUwgZW4gUG9zdGdyZVNRTCBjb24gUHN5Y29wZwoKPiAqKk9yaWdlbjoqKiBbaHR0cHM6Ly93d3cucG9zdGdyZXNxbC5vcmcvZG9jcy9jdXJyZW50L3NxbC5odG1sXShodHRwczovL3d3dy5wb3N0Z3Jlc3FsLm9yZy9kb2NzL2N1cnJlbnQvc3FsLmh0bWwpICAKPiAqKkNvbXBsZWppZGFkOioqIGBhZHZhbmNlZGAgfCAqKkVzdMOhbmRhcjoqKiBgT0tGIHYxLjAuMGAKCi0tLQoKIyMg8J+TjCBSZXN1bWVuIENvbmNlcHR1YWwgeSBQcm9ww7NzaXRvCkVzdGUgZG9jdW1lbnRvIGV4cGxvcmEgbG9zIGZ1bmRhbWVudG9zIHkgY2FwYWNpZGFkZXMgYXZhbnphZGFzIGRlbCBsZW5ndWFqZSBTUUwgZW4gUG9zdGdyZVNRTCwgYWJhcmNhbmRvIGRlc2RlIGxhIGRlZmluaWNpw7NuIGRlIGRhdG9zIChEREwpIHkgbWFuaXB1bGFjacOzbiAoRE1MKSBoYXN0YSBjb25zdWx0YXMgY29tcGxlamFzLCDDrW5kaWNlcyB5IGNvbmN1cnJlbmNpYS4gU2UgaW1wbGVtZW50YW4gY2Fzb3MgcHLDoWN0aWNvcyBlbiBQeXRob24gdXRpbGl6YW5kbyBwc3ljb3BnIHBhcmEgY29uZWN0YXIsIG1hbmlwdWxhciBlc3F1ZW1hcyB5IGVqZWN1dGFyIGNvbnN1bHRhcyBkZSBtYW5lcmEgZWZpY2llbnRlLgoKYGBgbWVybWFpZApncmFwaCBMUgogICAgSW5wdXRbIkVudHJhZGEgLyBDb25maWd1cmFjacOzbiJdIC0tPiBMb2dpY1siTMOzZ2ljYSBkZSBwb3N0Z3Jlc3FsLXNxbC1sYW5ndWFnZS1wc3ljb3BnIl0KICAgIExvZ2ljIC0tPiBPdXRwdXRbIlJlc3VsdGFkbyBWYWxpZGFkbyJdCmBgYAoKLS0tCgojIyDwn5ug77iPIFJlcXVpc2l0b3MgZGUgSW5zdGFsYWNpw7NuCmBgYGJhc2gKcGlwIGluc3RhbGwgcHN5Y29wZ1tiaW5hcnldPj0zLjEuMApgYGAKCi0tLQoKIyMg8J+agCBDYXNvcyBkZSBVc28geSBTY3JpcHRzIE1pbmltYWxpc3RhcwoKIyMjIENhc28gMTogUXVpY2tzdGFydCAvIEltcGxlbWVudGFjacOzbiBlbGVtZW50YWwgYsOhc2ljYQoqICoqRXNjZW5hcmlvOioqIEVzdGFibGVjZXIgdW5hIGNvbmV4acOzbiBiw6FzaWNhIGNvbiBQb3N0Z3JlU1FMLCBjcmVhciB1bmEgdGFibGEgdXNhbmRvIERETCBlIGluc2VydGFyIHVuIHJlZ2lzdHJvIGluaWNpYWwgbWVkaWFudGUgRE1MLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmltcG9ydCBwc3ljb3BnCgojIENvbmV4acOzbiBhIGxhIGJhc2UgZGUgZGF0b3MgUG9zdGdyZVNRTAojIEFzZWfDunJhdGUgZGUgY29uZmlndXJhciB0dXMgY3JlZGVuY2lhbGVzIGNvcnJlY3RhbWVudGUKY29ubl9pbmZvID0gImRibmFtZT10ZXN0IHVzZXI9cG9zdGdyZXMgcGFzc3dvcmQ9c2VjcmV0IGhvc3Q9bG9jYWxob3N0IHBvcnQ9NTQzMiIKCmRlZiBydW5fcXVpY2tzdGFydCgpIC0+IE5vbmU6CiAgICB3aXRoIHBzeWNvcGcuY29ubmVjdChjb25uX2luZm8pIGFzIGNvbm46CiAgICAgICAgd2l0aCBjb25uLmN1cnNvcigpIGFzIGN1cjoKICAgICAgICAgICAgIyBEREw6IENyZWFjacOzbiBkZSB0YWJsYQogICAgICAgICAgICBjdXIuZXhlY3V0ZSgiIiIKICAgICAgICAgICAgICAgIENSRUFURSBUQUJMRSBJRiBOT1QgRVhJU1RTIHVzZXJzICgKICAgICAgICAgICAgICAgICAgICBpZCBTRVJJQUwgUFJJTUFSWSBLRVksCiAgICAgICAgICAgICAgICAgICAgdXNlcm5hbWUgVkFSQ0hBUig1MCkgVU5JUVVFIE5PVCBOVUxMLAogICAgICAgICAgICAgICAgICAgIGNyZWF0ZWRfYXQgVElNRVNUQU1QIERFRkFVTFQgQ1VSUkVOVF9USU1FU1RBTVAKICAgICAgICAgICAgICAgICk7CiAgICAgICAgICAgICIiIikKICAgICAgICAgICAgCiAgICAgICAgICAgICMgRE1MOiBJbnNlcmNpw7NuIGRlIGRhdG9zCiAgICAgICAgICAgIGN1ci5leGVjdXRlKAogICAgICAgICAgICAgICAgIklOU0VSVCBJTlRPIHVzZXJzICh1c2VybmFtZSkgVkFMVUVTICglcykgT04gQ09ORkxJQ1QgKHVzZXJuYW1lKSBETyBOT1RISU5HOyIsCiAgICAgICAgICAgICAgICAoImFsaWNlX2RldiIsKQogICAgICAgICAgICApCiAgICAgICAgICAgIGNvbm4uY29tbWl0KCkKICAgICAgICAgICAgcHJpbnQoIlRhYmxhIGNyZWFkYSBlIGluc2VyY2nDs24gY29tcGxldGFkYSBjb24gw6l4aXRvLiIpCgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgcnVuX3F1aWNrc3RhcnQoKQpgYGAKCi0tLQoKIyMjIENhc28gMjogTWFuZWpvIGRlIEVycm9yZXMgeSBQcm9jZXNhbWllbnRvIGRlIExvdGVzCiogKipFc2NlbmFyaW86KiogRGVtb3N0cmFyIGVsIG1hbmVqbyB0cmFuc2FjY2lvbmFsIHJvYnVzdG8geSBsYSBpbnNlcmNpw7NuIG1hc2l2YSBlbiBsb3RlcyB1dGlsaXphbmRvIHBhcsOhbWV0cm9zIHNlZ3Vyb3MgcGFyYSBwcmV2ZW5pciBpbnllY2Npb25lcyBTUUwuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IHBzeWNvcGcKZnJvbSBwc3ljb3BnIGltcG9ydCBPcGVyYXRpb25hbEVycm9yLCBFcnJvcgoKY29ubl9pbmZvID0gImRibmFtZT10ZXN0IHVzZXI9cG9zdGdyZXMgcGFzc3dvcmQ9c2VjcmV0IGhvc3Q9bG9jYWxob3N0IHBvcnQ9NTQzMiIKCmRlZiBpbnNlcnRfYmF0Y2hfdXNlcnModXNlcnM6IGxpc3RbdHVwbGVbc3RyXV0pIC0+IE5vbmU6CiAgICB0cnk6CiAgICAgICAgd2l0aCBwc3ljb3BnLmNvbm5lY3QoY29ubl9pbmZvKSBhcyBjb25uOgogICAgICAgICAgICB3aXRoIGNvbm4uY3Vyc29yKCkgYXMgY3VyOgogICAgICAgICAgICAgICAgIyBQcm9jZXNhbWllbnRvIGVuIGxvdGVzIGNvbiBleGVjdXRlbWFueQogICAgICAgICAgICAgICAgY3VyLmV4ZWN1dGVtYW55KAogICAgICAgICAgICAgICAgICAgICJJTlNFUlQgSU5UTyB1c2VycyAodXNlcm5hbWUpIFZBTFVFUyAoJXMpIE9OIENPTkZMSUNUICh1c2VybmFtZSkgRE8gTk9USElORzsiLAogICAgICAgICAgICAgICAgICAgIHVzZXJzCiAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICBjb25uLmNvbW1pdCgpCiAgICAgICAgICAgICAgICBwcmludChmIkxvdGUgZGUge2xlbih1c2Vycyl9IHVzdWFyaW9zIHByb2Nlc2FkbyBjb3JyZWN0YW1lbnRlLiIpCiAgICBleGNlcHQgT3BlcmF0aW9uYWxFcnJvciBhcyBvZToKICAgICAgICBwcmludChmIkVycm9yIGRlIGNvbmV4acOzbiBhIGxhIGJhc2UgZGUgZGF0b3M6IHtvZX0iKQogICAgZXhjZXB0IEVycm9yIGFzIGU6CiAgICAgICAgcHJpbnQoZiJFcnJvciBvcGVyYWNpb25hbCBTUUw6IHtlfSIpCgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgYmF0Y2hfZGF0YSA9IFsoImJvYl9kZXYiLCksICgiY2hhcmxpZV9kZXYiLCksICgiZGlhbmFfZGV2IiwpXQogICAgaW5zZXJ0X2JhdGNoX3VzZXJzKGJhdGNoX2RhdGEpCmBgYAoKLS0tCgojIyMgQ2FzbyAzOiBQYXRyw7NuIGRlIFByb2R1Y2Npw7NuIHkgQ29uc3VsdGFzIEF2YW56YWRhcyBjb24gQ1RFcwoqICoqRXNjZW5hcmlvOioqIEltcGxlbWVudGFyIHVuIHBhdHLDs24gZGUgYXJxdWl0ZWN0dXJhIHJlc2lsaWVudGUgdXRpbGl6YW5kbyBDb21tb24gVGFibGUgRXhwcmVzc2lvbnMgKFdJVEggcXVlcmllcyksIG1hbmVqbyBkZSBjb250ZXh0b3MgeSByZWN1cGVyYWNpw7NuIGRlIGRhdG9zIG1vZGlmaWNhZG9zIChSRVRVUk5JTkcpLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmltcG9ydCBwc3ljb3BnCmZyb20gY29udGV4dGxpYiBpbXBvcnQgY29udGV4dG1hbmFnZXIKCkNPTk5fSU5GTyA9ICJkYm5hbWU9dGVzdCB1c2VyPXBvc3RncmVzIHBhc3N3b3JkPXNlY3JldCBob3N0PWxvY2FsaG9zdCBwb3J0PTU0MzIiCgpAY29udGV4dG1hbmFnZXIKZGVmIGdldF9kYl9jb25uZWN0aW9uKCk6CiAgICBjb25uID0gcHN5Y29wZy5jb25uZWN0KENPTk5fSU5GTykKICAgIHRyeToKICAgICAgICB5aWVsZCBjb25uCiAgICAgICAgY29ubi5jb21taXQoKQogICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICBjb25uLnJvbGxiYWNrKCkKICAgICAgICByYWlzZQogICAgZmluYWxseToKICAgICAgICBjb25uLmNsb3NlKCkKCmRlZiBleGVjdXRlX2FkdmFuY2VkX3F1ZXJ5KCkgLT4gTm9uZToKICAgIHdpdGggZ2V0X2RiX2Nvbm5lY3Rpb24oKSBhcyBjb25uOgogICAgICAgIHdpdGggY29ubi5jdXJzb3IoKSBhcyBjdXI6CiAgICAgICAgICAgICMgVXNvIGRlIENURSAoV0lUSCBxdWVyeSkgeSBjbMOhdXN1bGEgUkVUVVJOSU5HIHBhcmEgYW7DoWxpc2lzIGRlIGluc2VyY2nDs24vYWN0dWFsaXphY2nDs24KICAgICAgICAgICAgcXVlcnkgPSAiIiIKICAgICAgICAgICAgICAgIFdJVEggbmV3X3VzZXIgQVMgKAogICAgICAgICAgICAgICAgICAgIElOU0VSVCBJTlRPIHVzZXJzICh1c2VybmFtZSkgCiAgICAgICAgICAgICAgICAgICAgVkFMVUVTICglcykgCiAgICAgICAgICAgICAgICAgICAgT04gQ09ORkxJQ1QgKHVzZXJuYW1lKSBETyBOT1RISU5HIAogICAgICAgICAgICAgICAgICAgIFJFVFVSTklORyBpZCwgdXNlcm5hbWUsIGNyZWF0ZWRfYXQKICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgIFNFTEVDVCBpZCwgdXNlcm5hbWUsIGNyZWF0ZWRfYXQgRlJPTSBuZXdfdXNlcgogICAgICAgICAgICAgICAgVU5JT04KICAgICAgICAgICAgICAgIFNFTEVDVCBpZCwgdXNlcm5hbWUsIGNyZWF0ZWRfYXQgRlJPTSB1c2VycyBXSEVSRSB1c2VybmFtZSA9ICVzOwogICAgICAgICAgICAiIiIKICAgICAgICAgICAgdGFyZ2V0X3VzZXIgPSAiZW50ZXJwcmlzZV91c2VyIgogICAgICAgICAgICBjdXIuZXhlY3V0ZShxdWVyeSwgKHRhcmdldF91c2VyLCB0YXJnZXRfdXNlcikpCiAgICAgICAgICAgIHJlc3VsdCA9IGN1ci5mZXRjaG9uZSgpCiAgICAgICAgICAgIHByaW50KGYiUmVzdWx0YWRvIGRlIGxhIGNvbnN1bHRhIGF2YW56YWRhOiB7cmVzdWx0fSIpCgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgZXhlY3V0ZV9hZHZhbmNlZF9xdWVyeSgpCmBgYAoKLS0tCgoKIyMg4pqg77iPIENvbnNpZGVyYWNpb25lcyBUw6ljbmljYXMgeSBHb3RjaGFzCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBVdGlsaWNlIHNpZW1wcmUgY29uc3VsdGFzIHBhcmFtZXRyaXphZGFzICglcyBwbGFjZWhvbGRlcnMpIHBhcmEgZXZpdGFyIGlueWVjY2lvbmVzIFNRTC4KKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIEdlc3Rpb25lIGxhcyB0cmFuc2FjY2lvbmVzIGV4cGzDrWNpdGFtZW50ZSB1dGlsaXphbmRvIGJsb3F1ZXMgJ3dpdGgnIHBhcmEgYXNlZ3VyYXIgY29tbWl0cyB5IHJvbGxiYWNrcyBhdXRvbcOhdGljb3MuCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBBcHJvdmVjaGUgbGFzIHJlc3RyaWNjaW9uZXMgKENvbnN0cmFpbnRzKSB5IHRpcG9zIGRlIGRhdG9zIG5hdGl2b3MgZGUgUG9zdGdyZVNRTCBwYXJhIGdhcmFudGl6YXIgbGEgaW50ZWdyaWRhZCBhIG5pdmVsIGRlIGJhc2UgZGUgZGF0b3MuCiogKipHb3RjaGEvQWxlcnRhOioqIENvbnN0cnVpciBjb25zdWx0YXMgU1FMIG1lZGlhbnRlIGYtc3RyaW5ncyBvIGNvbmNhdGVuYWNpw7NuIGRpcmVjdGEgZGUgdmFyaWFibGVzLCBleHBvbmllbmRvIGxhIGFwbGljYWNpw7NuIGEgYXRhcXVlcyBkZSBpbnllY2Npw7NuIFNRTC4KKiAqKkdvdGNoYS9BbGVydGE6KiogSWdub3JhciBlbCBtYW5lam8gZGUgZXhjZXBjaW9uZXMgZXNwZWPDrWZpY2FzIGRlIGxhIGJhc2UgZGUgZGF0b3MsIGxvIHF1ZSBwdWVkZSBkZWphciB0cmFuc2FjY2lvbmVzIGNvbGdhZGFzIG8gYmxvcXVlYWRhcy4KKiAqKkdvdGNoYS9BbGVydGE6KiogTm8gdXRpbGl6YXIgw61uZGljZXMgYWRlY3VhZG9zIGVuIGNvbHVtbmFzIGRlIGFsdGEgY2FyZGluYWxpZGFkIHVzYWRhcyBmcmVjdWVudGVtZW50ZSBlbiBjbMOhdXN1bGFzIFdIRVJFIG8gSk9JTnMuCgotLS0KCiMjIPCflJcgTm9kb3MgUmVsYWNpb25hZG9zIGVuIGVsIEdyYWZvCiogW1swMV9Ta2lsbHMvU0tJTExfMDAxX1NjcmFwaW5nX3lfRXh0cmFjY2lvbl9XZWJ8SGFiaWxpZGFkIFTDqWNuaWNhOiBTY3JhcGluZyB5IEV4dHJhY2Npw7NuIFdlYl1dCiogW1swM19Qcm95ZWN0b3MvUFJPSl8wMDFfQWdlbnRlX1NjcmFwZXJ8UHJveWVjdG86IEFnZW50ZSBTY3JhcGVyXV0K" download="CU_022_postgresql-sql-language-psycopg.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>Este documento explora los fundamentos y capacidades avanzadas del lenguaje SQL en PostgreSQL, abarcando desde la definición de datos (DDL) y manipulación (DML) hasta consultas complejas, índices y concurrencia. Se implementan casos prácticos en Python utilizando psycopg para conectar, manipular esquemas y ejecutar consultas de manera eficiente.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Quickstart / Implementación elemental básica</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Establecer una conexión básica con PostgreSQL, crear una tabla usando DDL e insertar un registro inicial mediante DML.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import psycopg
+
+# Conexión a la base de datos PostgreSQL
+# Asegúrate de configurar tus credenciales correctamente
+conn_info = "dbname=test user=postgres password=secret host=localhost port=5432"
+
+def run_quickstart() -&gt; None:
+    with psycopg.connect(conn_info) as conn:
+        with conn.cursor() as cur:
+            # DDL: Creación de tabla
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    username VARCHAR(50) UNIQUE NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            
+            # DML: Inserción de datos
+            cur.execute(
+                "INSERT INTO users (username) VALUES (%s) ON CONFLICT (username) DO NOTHING;",
+                ("alice_dev",)
+            )
+            conn.commit()
+            print("Tabla creada e inserción completada con éxito.")
+
+if __name__ == "__main__":
+    run_quickstart()</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Manejo de Errores y Procesamiento de Lotes</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Demostrar el manejo transaccional robusto y la inserción masiva en lotes utilizando parámetros seguros para prevenir inyecciones SQL.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import psycopg
+from psycopg import OperationalError, Error
+
+conn_info = "dbname=test user=postgres password=secret host=localhost port=5432"
+
+def insert_batch_users(users: list[tuple[str]]) -&gt; None:
+    try:
+        with psycopg.connect(conn_info) as conn:
+            with conn.cursor() as cur:
+                # Procesamiento en lotes con executemany
+                cur.executemany(
+                    "INSERT INTO users (username) VALUES (%s) ON CONFLICT (username) DO NOTHING;",
+                    users
+                )
+                conn.commit()
+                print(f"Lote de {len(users)} usuarios procesado correctamente.")
+    except OperationalError as oe:
+        print(f"Error de conexión a la base de datos: {oe}")
+    except Error as e:
+        print(f"Error operacional SQL: {e}")
+
+if __name__ == "__main__":
+    batch_data = [("bob_dev",), ("charlie_dev",), ("diana_dev",)]
+    insert_batch_users(batch_data)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Producción y Consultas Avanzadas con CTEs</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementar un patrón de arquitectura resiliente utilizando Common Table Expressions (WITH queries), manejo de contextos y recuperación de datos modificados (RETURNING).</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import psycopg
+from contextlib import contextmanager
+
+CONN_INFO = "dbname=test user=postgres password=secret host=localhost port=5432"
+
+@contextmanager
+def get_db_connection():
+    conn = psycopg.connect(CONN_INFO)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+def execute_advanced_query() -&gt; None:
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            # Uso de CTE (WITH query) y cláusula RETURNING para análisis de inserción/actualización
+            query = """
+                WITH new_user AS (
+                    INSERT INTO users (username) 
+                    VALUES (%s) 
+                    ON CONFLICT (username) DO NOTHING 
+                    RETURNING id, username, created_at
+                )
+                SELECT id, username, created_at FROM new_user
+                UNION
+                SELECT id, username, created_at FROM users WHERE username = %s;
+            """
+            target_user = "enterprise_user"
+            cur.execute(query, (target_user, target_user))
+            result = cur.fetchone()
+            print(f"Resultado de la consulta avanzada: {result}")
+
+if __name__ == "__main__":
+    execute_advanced_query()</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilice siempre consultas parametrizadas (%s placeholders) para evitar inyecciones SQL.</li><li>✅ <strong>Práctica:</strong> Gestione las transacciones explícitamente utilizando bloques 'with' para asegurar commits y rollbacks automáticos.</li><li>✅ <strong>Práctica:</strong> Aproveche las restricciones (Constraints) y tipos de datos nativos de PostgreSQL para garantizar la integridad a nivel de base de datos.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> Construir consultas SQL mediante f-strings o concatenación directa de variables, exponiendo la aplicación a ataques de inyección SQL.</li><li>⚠️ <strong>Alerta:</strong> Ignorar el manejo de excepciones específicas de la base de datos, lo que puede dejar transacciones colgadas o bloqueadas.</li><li>⚠️ <strong>Alerta:</strong> No utilizar índices adecuados en columnas de alta cardinalidad usadas frecuentemente en cláusulas WHERE o JOINs.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

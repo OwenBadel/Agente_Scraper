@@ -1,0 +1,4 @@
+https://tailwindcss.com/docs/installation/using-vite
+https://developer.mozilla.org/es/docs/Web/CSS
+https://angular.dev/overview
+https://nodejs.org/docs/latest/api/

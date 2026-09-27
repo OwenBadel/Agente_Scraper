@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desarrollo de APIs Modernas con FastAPI y OpenAPI — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Desarrollo de APIs Modernas con FastAPI y OpenAPI</h1>
+            <p>Documentación técnica analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">basic</span>
+                <span>🌐 <strong>Documentación Oficial:</strong> <a href="https://fastapi.tiangolo.com/tutorial/first-steps/" target="_blank" style="color: #79f2f0; text-decoration: underline; font-family: monospace;">https://fastapi.tiangolo.com/tutorial/first-steps/ ↗</a></span>
+                <span>📦 Dependencias: <code>fastapi>=0.110.0 uvicorn>=0.28.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#fastapi</span><span class="tag">#api-rest</span><span class="tag">#openapi</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0 (Obsidian)</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wNDEtRkFTVEFQSS1PUEVOQVBJLU1JQ1JPU0VSVklDRVMKdGl0bGU6IERlc2Fycm9sbG8gZGUgQVBJcyBNb2Rlcm5hcyBjb24gRmFzdEFQSSB5IE9wZW5BUEkKdHlwZTogdXNlLWNhc2UKdmVyc2lvbjogMS4wLjAKc3RhdHVzOiBhY3RpdmUKY3JlYXRlZF9hdDogJzIwMjYtMDktMDVUMDk6MTg6MjYuNzgwNDI2LTA1OjAwJwp1cGRhdGVkX2F0OiAnMjAyNi0wOS0wNVQwOToxODoyNi43ODA0MjYtMDU6MDAnCnNvdXJjZV91cmw6IGh0dHBzOi8vZmFzdGFwaS50aWFuZ29sby5jb20vdHV0b3JpYWwvZmlyc3Qtc3RlcHMvCnRhZ3M6Ci0gcHl0aG9uCi0gZmFzdGFwaQotIGFwaS1yZXN0Ci0gb3BlbmFwaQotIGNhc28tZGUtdXNvCnNraWxsc19yZXF1aXJlZDoKLSAnW1swMV9Ta2lsbHMvU0tJTExfMDAxX1NjcmFwaW5nX3lfRXh0cmFjY2lvbl9XZWJ8U2NyYXBpbmcgeSBFeHRyYWNjacOzbiBXZWJdXScKZGVwZW5kZW5jaWVzOgotIGZhc3RhcGk+PTAuMTEwLjAKLSB1dmljb3JuPj0wLjI4LjAKY29tcGxleGl0eTogYmFzaWMKc2VtYW50aWNfc3VtbWFyeTogRmFzdEFQSSBlcyB1biBmcmFtZXdvcmsgd2ViIG1vZGVybm8geSBkZSBhbHRvIHJlbmRpbWllbnRvIHBhcmEgY29uc3RydWlyCiAgQVBJcyBjb24gUHl0aG9uIDMuMTArIGJhc2FkbyBlbiB0eXBlIGhpbnRzIGVzdMOhbmRhci4gU3UgYXJxdWl0ZWN0dXJhIG5hdGl2YSBhcHJvdmVjaGEKICBTdGFybGV0dGUgcGFyYSBlbCBtYW5lam8gd2ViIHkgUHlkYW50aWMgcGFyYSBsYSB2YWxpZGFjacOzbiBkZSBkYXRvcywgZ2VuZXJhbmRvIGF1dG9tw6F0aWNhbWVudGUKICBlc3F1ZW1hcyBjb25mb3JtZXMgY29uIE9wZW5BUEkgeSBsYSBlc3BlY2lmaWNhY2nDs24gZGUgSlNPTiBTY2hlbWEuCi0tLQoKIyDwn5KhIERlc2Fycm9sbG8gZGUgQVBJcyBNb2Rlcm5hcyBjb24gRmFzdEFQSSB5IE9wZW5BUEkKCj4gKipPcmlnZW46KiogW2h0dHBzOi8vZmFzdGFwaS50aWFuZ29sby5jb20vdHV0b3JpYWwvZmlyc3Qtc3RlcHMvXShodHRwczovL2Zhc3RhcGkudGlhbmdvbG8uY29tL3R1dG9yaWFsL2ZpcnN0LXN0ZXBzLykgIAo+ICoqQ29tcGxlamlkYWQ6KiogYGJhc2ljYCB8ICoqRXN0w6FuZGFyOioqIGBPS0YgdjEuMC4wYAoKLS0tCgojIyDwn5OMIFJlc3VtZW4gQ29uY2VwdHVhbCB5IFByb3DDs3NpdG8KRmFzdEFQSSBlcyB1biBmcmFtZXdvcmsgd2ViIG1vZGVybm8geSBkZSBhbHRvIHJlbmRpbWllbnRvIHBhcmEgY29uc3RydWlyIEFQSXMgY29uIFB5dGhvbiAzLjEwKyBiYXNhZG8gZW4gdHlwZSBoaW50cyBlc3TDoW5kYXIuIFN1IGFycXVpdGVjdHVyYSBuYXRpdmEgYXByb3ZlY2hhIFN0YXJsZXR0ZSBwYXJhIGVsIG1hbmVqbyB3ZWIgeSBQeWRhbnRpYyBwYXJhIGxhIHZhbGlkYWNpw7NuIGRlIGRhdG9zLCBnZW5lcmFuZG8gYXV0b23DoXRpY2FtZW50ZSBlc3F1ZW1hcyBjb25mb3JtZXMgY29uIE9wZW5BUEkgeSBsYSBlc3BlY2lmaWNhY2nDs24gZGUgSlNPTiBTY2hlbWEuCgpgYGBtZXJtYWlkCmdyYXBoIExSCiAgICBJbnB1dFsiRW50cmFkYSAvIENvbmZpZ3VyYWNpw7NuIl0gLS0+IExvZ2ljWyJMw7NnaWNhIGRlIGZhc3RhcGktb3BlbmFwaS1taWNyb3NlcnZpY2VzIl0KICAgIExvZ2ljIC0tPiBPdXRwdXRbIlJlc3VsdGFkbyBWYWxpZGFkbyJdCmBgYAoKLS0tCgojIyDwn5ug77iPIFJlcXVpc2l0b3MgZGUgSW5zdGFsYWNpw7NuCmBgYGJhc2gKcGlwIGluc3RhbGwgZmFzdGFwaT49MC4xMTAuMCB1dmljb3JuPj0wLjI4LjAKYGBgCgotLS0KCiMjIPCfmoAgQ2Fzb3MgZGUgVXNvIHkgU2NyaXB0cyBNaW5pbWFsaXN0YXMKCiMjIyBDYXNvIDE6IEluaWNpYWxpemFjacOzbiB5IEVucnV0YW1pZW50byBCYXNlIGRlIEVuZHBvaW50cyAoUGF0aCBPcGVyYXRpb25zKQoqICoqRXNjZW5hcmlvOioqIEltcGxlbWVudGFjacOzbiBkZWwgbsO6Y2xlbyBkZSBsYSBhcGxpY2FjacOzbiBGYXN0QVBJIGluc3RhbmNpYW5kbyBsYSBjbGFzZSBwcmluY2lwYWwgeSBleHBvbmllbmRvIHVuIHJlY3Vyc28gSFRUUCBHRVQgYmFqbyBlbCBwYXRoIHJhw616IGNvbiB0aXBhZG8gZXN0cmljdG8uCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KZnJvbSBmYXN0YXBpIGltcG9ydCBGYXN0QVBJCgphcHAgPSBGYXN0QVBJKHRpdGxlPSJDb3JlIE1pY3Jvc2VydmljZSIsIHZlcnNpb249IjEuMC4wIikKCkBhcHAuZ2V0KCIvIikKYXN5bmMgZGVmIHJvb3QoKSAtPiBkaWN0W3N0ciwgc3RyXToKICAgIHJldHVybiB7Im1lc3NhZ2UiOiAiSGVsbG8gV29ybGQgZnJvbSBGYXN0QVBJIENvcmUifQoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIGltcG9ydCB1dmljb3JuCiAgICB1dmljb3JuLnJ1bigibWFpbjphcHAiLCBob3N0PSIxMjcuMC4wLjEiLCBwb3J0PTgwMDAsIHJlbG9hZD1UcnVlKQpgYGAKCi0tLQoKIyMjIENhc28gMjogUHJvY2VzYW1pZW50byBBc8OtbmNyb25vIGRlIFBhcsOhbWV0cm9zIHkgVmFsaWRhY2nDs24gZGUgTW9kZWxvcyBQeWRhbnRpYwoqICoqRXNjZW5hcmlvOioqIERpc2XDsW8gZGUgdW4gcGF0aCBvcGVyYXRpb24gYXPDrW5jcm9ubyBxdWUgcHJvY2VzYSBwYXLDoW1ldHJvcyBkZSBydXRhIHkgY29uc3VsdGEsIGFwbGljYW5kbyB2YWxpZGFjacOzbiBhdXRvbcOhdGljYSBtZWRpYW50ZSBlc3F1ZW1hcyBkZWNsYXJhdGl2b3MuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KZnJvbSBmYXN0YXBpIGltcG9ydCBGYXN0QVBJLCBIVFRQRXhjZXB0aW9uLCBRdWVyeQpmcm9tIHB5ZGFudGljIGltcG9ydCBCYXNlTW9kZWwsIEZpZWxkCgphcHAgPSBGYXN0QVBJKCkKCmNsYXNzIEl0ZW0oQmFzZU1vZGVsKToKICAgIG5hbWU6IHN0ciA9IEZpZWxkKC4uLiwgbWluX2xlbmd0aD0yLCBtYXhfbGVuZ3RoPTUwKQogICAgcHJpY2U6IGZsb2F0ID0gRmllbGQoLi4uLCBndD0wKQogICAgdGF4OiBmbG9hdCB8IE5vbmUgPSBOb25lCgpAYXBwLnBvc3QoIi9pdGVtcy8iKQphc3luYyBkZWYgY3JlYXRlX2l0ZW0oaXRlbTogSXRlbSwgcTogc3RyIHwgTm9uZSA9IFF1ZXJ5KGRlZmF1bHQ9Tm9uZSwgbWF4X2xlbmd0aD0yMCkpIC0+IGRpY3Q6CiAgICByZXN1bHQgPSBpdGVtLm1vZGVsX2R1bXAoKQogICAgaWYgcToKICAgICAgICByZXN1bHRbInF1ZXJ5X3BhcmFtIl0gPSBxCiAgICByZXR1cm4geyJzdGF0dXMiOiAic3VjY2VzcyIsICJkYXRhIjogcmVzdWx0fQpgYGAKCi0tLQoKIyMjIENhc28gMzogSW5zcGVjY2nDs24gRGluw6FtaWNhIGRlbCBFc3F1ZW1hIE9wZW5BUEkgeSBDb25maWd1cmFjacOzbiBkZSBFbnRyeXBvaW50IE1vZHVsYXIKKiAqKkVzY2VuYXJpbzoqKiBBY2Nlc28gcHJvZ3JhbcOhdGljbyBhIGxhIGVzcGVjaWZpY2FjacOzbiBPcGVuQVBJIGdlbmVyYWRhIHBvciBlbCBmcmFtZXdvcmsgeSBlc3RydWN0dXJhY2nDs24gZGUgbGEgYXBsaWNhY2nDs24gcGFyYSBlbnRvcm5vcyBkZSBwcm9kdWNjacOzbiBtZWRpYW50ZSBlbnRyeXBvaW50cyBkZWZpbmlkb3MuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KZnJvbSBmYXN0YXBpIGltcG9ydCBGYXN0QVBJCgphcHAgPSBGYXN0QVBJKAogICAgdGl0bGU9IlByb2R1Y3Rpb24gUmVhZHkgQVBJIiwKICAgIHZlcnNpb249IjIuMC4wIiwKICAgIGRvY3NfdXJsPSIvZG9jcyIsCiAgICByZWRvY191cmw9Ii9yZWRvYyIKKQoKQGFwcC5nZXQoIi9oZWFsdGgiKQphc3luYyBkZWYgaGVhbHRoX2NoZWNrKCkgLT4gZGljdFtzdHIsIHN0cl06CiAgICByZXR1cm4geyJzdGF0dXMiOiAiaGVhbHRoeSJ9CgpAYXBwLmdldCgiL3NjaGVtYS1zdW1tYXJ5IikKYXN5bmMgZGVmIGdldF9zY2hlbWFfc3VtbWFyeSgpIC0+IGRpY3Q6CiAgICBvcGVuYXBpX3NjaGVtYSA9IGFwcC5vcGVuYXBpKCkKICAgIHJldHVybiB7CiAgICAgICAgInRpdGxlIjogb3BlbmFwaV9zY2hlbWFbImluZm8iXVsidGl0bGUiXSwKICAgICAgICAidmVyc2lvbiI6IG9wZW5hcGlfc2NoZW1hWyJpbmZvIl1bInZlcnNpb24iXSwKICAgICAgICAidG90YWxfcGF0aHMiOiBsZW4ob3BlbmFwaV9zY2hlbWFbInBhdGhzIl0pCiAgICB9CmBgYAoKLS0tCgoKIyMg4pqg77iPIENvbnNpZGVyYWNpb25lcyBUw6ljbmljYXMgeSBHb3RjaGFzCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBVdGlsaXphciBmdW5jaW9uZXMgJ2FzeW5jIGRlZicgcGFyYSBvcGVyYWNpb25lcyBJL08gaW50ZW5zaXZhcyBhcHJvdmVjaGFuZG8gZWwgZXZlbnQgbG9vcCBzdWJ5YWNlbnRlLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogQ29uZmlndXJhciBleHBsw61jaXRhbWVudGUgbG9zIG1ldGFkYXRvcyB5IGVzcXVlbWFzIGRlIE9wZW5BUEkgZW4gbGEgaW5zdGFuY2lhY2nDs24gZGUgRmFzdEFQSSBwYXJhIGZhY2lsaXRhciBsYSBpbnRlZ3JhY2nDs24gY29uIGNsaWVudGVzIGdlbmVyYWRvcyBhdXRvbcOhdGljYW1lbnRlLgoqICoqR290Y2hhL0FsZXJ0YToqKiBDb25mdW5kaXIgZWwgdXNvIGRlIG3DqXRvZG9zIHPDrW5jcm9ub3MgKCdkZWYnKSBjb24gYXPDrW5jcm9ub3MgKCdhc3luYyBkZWYnKSBibG9xdWVhbmRvIGVsIGV2ZW50IGxvb3AgZGUgVXZpY29ybiBhbnRlIGNvbnN1bHRhcyBibG9xdWVhbnRlcy4KKiAqKkdvdGNoYS9BbGVydGE6KiogT21pdGlyIGxhIHZhbGlkYWNpw7NuIGRlIHRpcG9zIG1lZGlhbnRlIGFub3RhY2lvbmVzIGRlIFB5dGhvbiB5IG1vZGVsb3MgUHlkYW50aWMsIHBlcmRpZW5kbyBsYSBnZW5lcmFjacOzbiBhdXRvbcOhdGljYSBkZSBsYSBkb2N1bWVudGFjacOzbiBpbnRlcmFjdGl2YS4KCi0tLQoKIyMg8J+UlyBOb2RvcyBSZWxhY2lvbmFkb3MgZW4gZWwgR3JhZm8KKiBbWzAxX1NraWxscy9TS0lMTF8wMDFfU2NyYXBpbmdfeV9FeHRyYWNjaW9uX1dlYnxIYWJpbGlkYWQgVMOpY25pY2E6IFNjcmFwaW5nIHkgRXh0cmFjY2nDs24gV2ViXV0KKiBbWzAzX1Byb3llY3Rvcy9QUk9KXzAwMV9BZ2VudGVfU2NyYXBlcnxQcm95ZWN0bzogQWdlbnRlIFNjcmFwZXJdXQo=" download="CU_041_fastapi-openapi-microservices.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Técnico de la Documentación</h2>
+            <p>FastAPI es un framework web moderno y de alto rendimiento para construir APIs con Python 3.10+ basado en type hints estándar. Su arquitectura nativa aprovecha Starlette para el manejo web y Pydantic para la validación de datos, generando automáticamente esquemas conformes con OpenAPI y la especificación de JSON Schema.</p>
+            <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #94a3b8;">
+                🔗 <strong>Fuente:</strong> <a href="https://fastapi.tiangolo.com/tutorial/first-steps/" target="_blank" style="color: #818cf8; text-decoration: underline;">https://fastapi.tiangolo.com/tutorial/first-steps/</a>
+            </div>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Inicialización y Enrutamiento Base de Endpoints (Path Operations)</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementación del núcleo de la aplicación FastAPI instanciando la clase principal y exponiendo un recurso HTTP GET bajo el path raíz con tipado estricto.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+
+app = FastAPI(title="Core Microservice", version="1.0.0")
+
+@app.get("/")
+async def root() -&gt; dict[str, str]:
+    return {"message": "Hello World from FastAPI Core"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Procesamiento Asíncrono de Parámetros y Validación de Modelos Pydantic</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Diseño de un path operation asíncrono que procesa parámetros de ruta y consulta, aplicando validación automática mediante esquemas declarativos.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str = Field(..., min_length=2, max_length=50)
+    price: float = Field(..., gt=0)
+    tax: float | None = None
+
+@app.post("/items/")
+async def create_item(item: Item, q: str | None = Query(default=None, max_length=20)) -&gt; dict:
+    result = item.model_dump()
+    if q:
+        result["query_param"] = q
+    return {"status": "success", "data": result}</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Inspección Dinámica del Esquema OpenAPI y Configuración de Entrypoint Modular</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Acceso programático a la especificación OpenAPI generada por el framework y estructuración de la aplicación para entornos de producción mediante entrypoints definidos.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+
+app = FastAPI(
+    title="Production Ready API",
+    version="2.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
+
+@app.get("/health")
+async def health_check() -&gt; dict[str, str]:
+    return {"status": "healthy"}
+
+@app.get("/schema-summary")
+async def get_schema_summary() -&gt; dict:
+    openapi_schema = app.openapi()
+    return {
+        "title": openapi_schema["info"]["title"],
+        "version": openapi_schema["info"]["version"],
+        "total_paths": len(openapi_schema["paths"])
+    }</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar funciones 'async def' para operaciones I/O intensivas aprovechando el event loop subyacente.</li><li>✅ <strong>Práctica:</strong> Configurar explícitamente los metadatos y esquemas de OpenAPI en la instanciación de FastAPI para facilitar la integración con clientes generados automáticamente.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> Confundir el uso de métodos síncronos ('def') con asíncronos ('async def') bloqueando el event loop de Uvicorn ante consultas bloqueantes.</li><li>⚠️ <strong>Alerta:</strong> Omitir la validación de tipos mediante anotaciones de Python y modelos Pydantic, perdiendo la generación automática de la documentación interactiva.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

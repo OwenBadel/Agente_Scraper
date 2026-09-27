@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desarrollo de APIs Modernas con FastAPI — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">Desarrollo de APIs Modernas con FastAPI</h1>
+            <p>Documentación analizada por el Agente Scraper (Fábrica de Software)</p>
+            
+            <div class="meta-bar">
+                <span class="badge">basic</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>fastapi>=0.100.0 uvicorn[standard]>=0.20.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#fastapi</span><span class="tag">#rest-api</span><span class="tag">#async</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMTItRkFTVEFQSS1GSVJTVC1TVEVQUwp0aXRsZTogRGVzYXJyb2xsbyBkZSBBUElzIE1vZGVybmFzIGNvbiBGYXN0QVBJCnR5cGU6IHVzZS1jYXNlCnZlcnNpb246IDEuMC4wCnN0YXR1czogYWN0aXZlCmNyZWF0ZWRfYXQ6ICcyMDI2LTA4LTI5VDE5OjQ4OjIzLjQ3NjgwOS0wNTowMCcKdXBkYXRlZF9hdDogJzIwMjYtMDgtMjlUMTk6NDg6MjMuNDc2ODA5LTA1OjAwJwpzb3VyY2VfdXJsOiBodHRwczovL2Zhc3RhcGkudGlhbmdvbG8uY29tL3R1dG9yaWFsL2ZpcnN0LXN0ZXBzLwp0YWdzOgotIHB5dGhvbgotIGZhc3RhcGkKLSByZXN0LWFwaQotIGFzeW5jCi0gY2Fzby1kZS11c28Kc2tpbGxzX3JlcXVpcmVkOgotIDAxX1NraWxscy9TS0lMTF9QWVRIT05fQVNZTkMKLSAwMV9Ta2lsbHMvU0tJTExfQVBJX0RFU0lHTgpkZXBlbmRlbmNpZXM6Ci0gZmFzdGFwaT49MC4xMDAuMAotIHV2aWNvcm5bc3RhbmRhcmRdPj0wLjIwLjAKY29tcGxleGl0eTogYmFzaWMKc2VtYW50aWNfc3VtbWFyeTogRmFzdEFQSSBlcyB1biBmcmFtZXdvcmsgd2ViIGRlIGFsdG8gcmVuZGltaWVudG8gZGlzZcOxYWRvIHBhcmEgY29uc3RydWlyCiAgQVBJcyBjb24gUHl0aG9uIDMuMTArIHV0aWxpemFuZG8gYW5vdGFjaW9uZXMgZGUgdGlwbyBlc3TDoW5kYXIuIFN1IGFycXVpdGVjdHVyYSBzZQogIGJhc2EgZW4gU3RhcmxldHRlIHkgUHlkYW50aWMsIHBlcm1pdGllbmRvIGxhIGdlbmVyYWNpw7NuIGF1dG9tw6F0aWNhIGRlIGVzcXVlbWFzIE9wZW5BUEkKICB5IGRvY3VtZW50YWNpw7NuIGludGVyYWN0aXZhIChTd2FnZ2VyIFVJL1JlRG9jKSBzaW4gY29uZmlndXJhY2nDs24gYWRpY2lvbmFsLgotLS0KCiMg8J+SoSBEZXNhcnJvbGxvIGRlIEFQSXMgTW9kZXJuYXMgY29uIEZhc3RBUEkKCj4gKipPcmlnZW46KiogW2h0dHBzOi8vZmFzdGFwaS50aWFuZ29sby5jb20vdHV0b3JpYWwvZmlyc3Qtc3RlcHMvXShodHRwczovL2Zhc3RhcGkudGlhbmdvbG8uY29tL3R1dG9yaWFsL2ZpcnN0LXN0ZXBzLykgIAo+ICoqQ29tcGxlamlkYWQ6KiogYGJhc2ljYCB8ICoqRXN0w6FuZGFyOioqIGBPS0YgdjEuMC4wYAoKLS0tCgojIyDwn5OMIFJlc3VtZW4gQ29uY2VwdHVhbCB5IFByb3DDs3NpdG8KRmFzdEFQSSBlcyB1biBmcmFtZXdvcmsgd2ViIGRlIGFsdG8gcmVuZGltaWVudG8gZGlzZcOxYWRvIHBhcmEgY29uc3RydWlyIEFQSXMgY29uIFB5dGhvbiAzLjEwKyB1dGlsaXphbmRvIGFub3RhY2lvbmVzIGRlIHRpcG8gZXN0w6FuZGFyLiBTdSBhcnF1aXRlY3R1cmEgc2UgYmFzYSBlbiBTdGFybGV0dGUgeSBQeWRhbnRpYywgcGVybWl0aWVuZG8gbGEgZ2VuZXJhY2nDs24gYXV0b23DoXRpY2EgZGUgZXNxdWVtYXMgT3BlbkFQSSB5IGRvY3VtZW50YWNpw7NuIGludGVyYWN0aXZhIChTd2FnZ2VyIFVJL1JlRG9jKSBzaW4gY29uZmlndXJhY2nDs24gYWRpY2lvbmFsLgoKYGBgbWVybWFpZApncmFwaCBMUgogICAgSW5wdXRbIkVudHJhZGEgLyBDb25maWd1cmFjacOzbiJdIC0tPiBMb2dpY1siTMOzZ2ljYSBkZSBmYXN0YXBpLWZpcnN0LXN0ZXBzIl0KICAgIExvZ2ljIC0tPiBPdXRwdXRbIlJlc3VsdGFkbyBWYWxpZGFkbyJdCmBgYAoKLS0tCgojIyDwn5ug77iPIFJlcXVpc2l0b3MgZGUgSW5zdGFsYWNpw7NuCmBgYGJhc2gKcGlwIGluc3RhbGwgZmFzdGFwaT49MC4xMDAuMCB1dmljb3JuW3N0YW5kYXJkXT49MC4yMC4wCmBgYAoKLS0tCgojIyDwn5qAIENhc29zIGRlIFVzbyB5IFNjcmlwdHMgTWluaW1hbGlzdGFzCgojIyMgQ2FzbyAxOiBRdWlja3N0YXJ0OiBQdW50byBkZSBFbnRyYWRhIE1pbmltYWxpc3RhCiogKipFc2NlbmFyaW86KiogSW1wbGVtZW50YWNpw7NuIGRlIHVuIGVuZHBvaW50IGLDoXNpY28gcGFyYSB2ZXJpZmljYXIgZWwgZXN0YWRvIGRlbCBzZXJ2aWNpbyBjb24gdGlwYWRvIGVzdHJpY3RvLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmZyb20gZmFzdGFwaSBpbXBvcnQgRmFzdEFQSQoKYXBwID0gRmFzdEFQSSgpCgpAYXBwLmdldCgiL2hlYWx0aCIpCmFzeW5jIGRlZiBoZWFsdGhfY2hlY2soKSAtPiBkaWN0W3N0ciwgc3RyXToKICAgIHJldHVybiB7InN0YXR1cyI6ICJvayIsICJtZXNzYWdlIjogIlNlcnZpY2UgaXMgcnVubmluZyJ9CmBgYAoKLS0tCgojIyMgQ2FzbyAyOiBNYW5lam8gZGUgUGFyw6FtZXRyb3MgeSBFeGNlcGNpb25lcyBBc8OtbmNyb25hcwoqICoqRXNjZW5hcmlvOioqIFByb2Nlc2FtaWVudG8gZGUgcGFyw6FtZXRyb3MgZGUgcnV0YSBjb24gdmFsaWRhY2nDs24gbMOzZ2ljYSB5IG1hbmVqbyBkZSBlcnJvcmVzIEhUVFAgZXhwbMOtY2l0b3MuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KZnJvbSBmYXN0YXBpIGltcG9ydCBGYXN0QVBJLCBIVFRQRXhjZXB0aW9uCmltcG9ydCBhc3luY2lvCgphcHAgPSBGYXN0QVBJKCkKCkBhcHAuZ2V0KCIvaXRlbXMve2l0ZW1faWR9IikKYXN5bmMgZGVmIHJlYWRfaXRlbShpdGVtX2lkOiBpbnQpIC0+IGRpY3Rbc3RyLCBpbnQgfCBzdHJdOgogICAgaWYgaXRlbV9pZCA8IDE6CiAgICAgICAgcmFpc2UgSFRUUEV4Y2VwdGlvbihzdGF0dXNfY29kZT00MDAsIGRldGFpbD0iSW52YWxpZCBJRDogTXVzdCBiZSBwb3NpdGl2ZSIpCiAgICAKICAgICMgU2ltdWxhY2nDs24gZGUgbGF0ZW5jaWEgZGUgYmFzZSBkZSBkYXRvcwogICAgYXdhaXQgYXN5bmNpby5zbGVlcCgwLjAxKQogICAgcmV0dXJuIHsiaXRlbV9pZCI6IGl0ZW1faWQsICJhY3Rpb24iOiAiZmV0Y2hfc3VjY2VzcyJ9CmBgYAoKLS0tCgojIyMgQ2FzbyAzOiBQYXRyw7NuIGRlIFByb2R1Y2Npw7NuOiBWYWxpZGFjacOzbiBjb24gUHlkYW50aWMKKiAqKkVzY2VuYXJpbzoqKiBFc3RydWN0dXJhIHByb2Zlc2lvbmFsIHV0aWxpemFuZG8gbW9kZWxvcyBkZSBkYXRvcyBwYXJhIHZhbGlkYWNpw7NuIGF1dG9tw6F0aWNhIGRlIHBheWxvYWRzIGVuIG9wZXJhY2lvbmVzIFBPU1QuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KZnJvbSBmYXN0YXBpIGltcG9ydCBGYXN0QVBJCmZyb20gcHlkYW50aWMgaW1wb3J0IEJhc2VNb2RlbCwgRmllbGQKCmNsYXNzIFByb2R1Y3QoQmFzZU1vZGVsKToKICAgIG5hbWU6IHN0ciA9IEZpZWxkKC4uLiwgbWluX2xlbmd0aD0zKQogICAgcHJpY2U6IGZsb2F0ID0gRmllbGQoLi4uLCBndD0wKQoKYXBwID0gRmFzdEFQSSh0aXRsZT0iSW52ZW50b3J5IEFQSSIpCgpAYXBwLnBvc3QoIi9wcm9kdWN0cy8iLCBzdGF0dXNfY29kZT0yMDEpCmFzeW5jIGRlZiBjcmVhdGVfcHJvZHVjdChwcm9kdWN0OiBQcm9kdWN0KSAtPiBkaWN0W3N0ciwgUHJvZHVjdF06CiAgICAjIEVsIGVzcXVlbWEgT3BlbkFQSSBzZSBnZW5lcmEgYXV0b23DoXRpY2FtZW50ZSBkZXNkZSBlbCBtb2RlbG8gUHJvZHVjdAogICAgcmV0dXJuIHsiZGF0YSI6IHByb2R1Y3R9CmBgYAoKLS0tCgoKIyMg4pqg77iPIENvbnNpZGVyYWNpb25lcyBUw6ljbmljYXMgeSBHb3RjaGFzCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBVdGlsaXphciBzaWVtcHJlIGFub3RhY2lvbmVzIGRlIHRpcG8gKFR5cGUgSGludHMpIHBhcmEgbWVqb3JhciBsYSBhdXRvY29tcGxldGFjacOzbiB5IHZhbGlkYWNpw7NuLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogQXByb3ZlY2hhciBsYSBkb2N1bWVudGFjacOzbiBhdXRvbcOhdGljYSBlbiAvZG9jcyBkdXJhbnRlIGVsIGRlc2Fycm9sbG8uCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBEZWZpbmlyIG1vZGVsb3MgUHlkYW50aWMgcGFyYSBlc3RydWN0dXJhciBsYXMgcmVzcHVlc3RhcyB5IHBldGljaW9uZXMuCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBVc2FyICdhc3luYyBkZWYnIHBhcmEgb3BlcmFjaW9uZXMgZGUgRS9TIChJL08gYm91bmQpIHBhcmEgbWF4aW1pemFyIGVsIHJlbmRpbWllbnRvLgoqICoqR290Y2hhL0FsZXJ0YToqKiBObyBkZWZpbmlyIGVsICdlbnRyeXBvaW50JyBlbiBlbCBweXByb2plY3QudG9tbCwgbG8gcXVlIGRpZmljdWx0YSBlbCBkZXNwbGllZ3VlIGF1dG9tw6F0aWNvLgoqICoqR290Y2hhL0FsZXJ0YToqKiBDb25mdW5kaXIgcGFyw6FtZXRyb3MgZGUgcnV0YSBjb24gcGFyw6FtZXRyb3MgZGUgY29uc3VsdGEgKHF1ZXJ5IHBhcmFtcykuCiogKipHb3RjaGEvQWxlcnRhOioqIE9taXRpciBlbCBtYW5lam8gZGUgZXhjZXBjaW9uZXMgZXNwZWPDrWZpY2FzLCByZXN1bHRhbmRvIGVuIGVycm9yZXMgNTAwIGdlbsOpcmljb3MuCgotLS0KCiMjIPCflJcgTm9kb3MgUmVsYWNpb25hZG9zIGVuIGVsIEdyYWZvCiogW1swMF9JbmRpY2VfRmFicmljYXxNT0MgQ2VudHJhbF1dCiogW1swMl9DYXNvc19kZV9Vc28vMDJfSW5kaWNlX0Nhc29zX2RlX1Vzb3zDjW5kaWNlIGRlIENhc29zIGRlIFVzb11dCiogW1swMV9Ta2lsbHMvMDFfSW5kaWNlX1NraWxsc3zDjW5kaWNlIGRlIFNraWxsc11dCg==" download="CU_012_fastapi-first-steps.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>FastAPI es un framework web de alto rendimiento diseñado para construir APIs con Python 3.10+ utilizando anotaciones de tipo estándar. Su arquitectura se basa en Starlette y Pydantic, permitiendo la generación automática de esquemas OpenAPI y documentación interactiva (Swagger UI/ReDoc) sin configuración adicional.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Quickstart: Punto de Entrada Minimalista</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementación de un endpoint básico para verificar el estado del servicio con tipado estricto.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/health")
+async def health_check() -&gt; dict[str, str]:
+    return {"status": "ok", "message": "Service is running"}</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Manejo de Parámetros y Excepciones Asíncronas</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Procesamiento de parámetros de ruta con validación lógica y manejo de errores HTTP explícitos.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI, HTTPException
+import asyncio
+
+app = FastAPI()
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int) -&gt; dict[str, int | str]:
+    if item_id &lt; 1:
+        raise HTTPException(status_code=400, detail="Invalid ID: Must be positive")
+    
+    # Simulación de latencia de base de datos
+    await asyncio.sleep(0.01)
+    return {"item_id": item_id, "action": "fetch_success"}</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Producción: Validación con Pydantic</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Estructura profesional utilizando modelos de datos para validación automática de payloads en operaciones POST.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+class Product(BaseModel):
+    name: str = Field(..., min_length=3)
+    price: float = Field(..., gt=0)
+
+app = FastAPI(title="Inventory API")
+
+@app.post("/products/", status_code=201)
+async def create_product(product: Product) -&gt; dict[str, Product]:
+    # El esquema OpenAPI se genera automáticamente desde el modelo Product
+    return {"data": product}</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar siempre anotaciones de tipo (Type Hints) para mejorar la autocompletación y validación.</li><li>✅ <strong>Práctica:</strong> Aprovechar la documentación automática en /docs durante el desarrollo.</li><li>✅ <strong>Práctica:</strong> Definir modelos Pydantic para estructurar las respuestas y peticiones.</li><li>✅ <strong>Práctica:</strong> Usar 'async def' para operaciones de E/S (I/O bound) para maximizar el rendimiento.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> No definir el 'entrypoint' en el pyproject.toml, lo que dificulta el despliegue automático.</li><li>⚠️ <strong>Alerta:</strong> Confundir parámetros de ruta con parámetros de consulta (query params).</li><li>⚠️ <strong>Alerta:</strong> Omitir el manejo de excepciones específicas, resultando en errores 500 genéricos.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Fábrica de Software Autónoma | Grafo de Conocimiento Interoperable (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

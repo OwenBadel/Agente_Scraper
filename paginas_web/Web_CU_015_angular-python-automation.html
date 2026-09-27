@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatización y Orquestación de Ecosistemas Angular con Python — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">Automatización y Orquestación de Ecosistemas Angular con Python</h1>
+            <p>Documentación analizada por el Agente Scraper (Fábrica de Software)</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>pydantic>=2.6.0 aiofiles>=23.2.1</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#angular</span><span class="tag">#automation</span><span class="tag">#devops</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMTUtQU5HVUxBUi1QWVRIT04tQVVUT01BVElPTgp0aXRsZTogQXV0b21hdGl6YWNpw7NuIHkgT3JxdWVzdGFjacOzbiBkZSBFY29zaXN0ZW1hcyBBbmd1bGFyIGNvbiBQeXRob24KdHlwZTogdXNlLWNhc2UKdmVyc2lvbjogMS4wLjAKc3RhdHVzOiBhY3RpdmUKY3JlYXRlZF9hdDogJzIwMjYtMDgtMjlUMTk6NDk6MTYuMjQ5Njk5LTA1OjAwJwp1cGRhdGVkX2F0OiAnMjAyNi0wOC0yOVQxOTo0OToxNi4yNDk2OTktMDU6MDAnCnNvdXJjZV91cmw6IGh0dHBzOi8vYW5ndWxhci5kZXYvb3ZlcnZpZXcKdGFnczoKLSBweXRob24KLSBhbmd1bGFyCi0gYXV0b21hdGlvbgotIGRldm9wcwotIGNhc28tZGUtdXNvCnNraWxsc19yZXF1aXJlZDoKLSAwMV9Ta2lsbHMvU0tJTEwtMDAxLVNDUkFQSU5HLUVYVFJBQ0NJT04tV0VCCmRlcGVuZGVuY2llczoKLSBweWRhbnRpYz49Mi42LjAKLSBhaW9maWxlcz49MjMuMi4xCmNvbXBsZXhpdHk6IGludGVybWVkaWF0ZQpzZW1hbnRpY19zdW1tYXJ5OiBBbmd1bGFyIGVzIHVuIGZyYW1ld29yayBkZSBkZXNhcnJvbGxvIHdlYiBtYW50ZW5pZG8gcG9yIEdvb2dsZSBxdWUKICBzZSBjZW50cmEgZW4gbGEgZXNjYWxhYmlsaWRhZCwgcmVhY3RpdmlkYWQgbWVkaWFudGUgU2lnbmFscyB5IGVmaWNpZW5jaWEgbWVkaWFudGUKICBTZXJ2ZXItU2lkZSBSZW5kZXJpbmcgKFNTUikuIEVuIGVudG9ybm9zIGRlIGluZ2VuaWVyw61hIGRlIHNvZnR3YXJlLCBQeXRob24gYWN0w7phCiAgY29tbyBlbCBtb3RvciBkZSBhdXRvbWF0aXphY2nDs24gcGFyYSBnZXN0aW9uYXIgZWwgY2ljbG8gZGUgdmlkYSBkZSBlc3RhcyBhcGxpY2FjaW9uZXMsCiAgZmFjaWxpdGFuZG8gZWwgc2NhZmZvbGRpbmcsIGxhIHZhbGlkYWNpw7NuIGRlIGNvbmZpZ3VyYWNpb25lcyBjb21wbGVqYXMgZW4gbW9ub3JlcG9zCiAgeSBsYSBvcnF1ZXN0YWNpw7NuIGRlIGRlc3BsaWVndWVzIG9wdGltaXphZG9zLgotLS0KCiMg8J+SoSBBdXRvbWF0aXphY2nDs24geSBPcnF1ZXN0YWNpw7NuIGRlIEVjb3Npc3RlbWFzIEFuZ3VsYXIgY29uIFB5dGhvbgoKPiAqKk9yaWdlbjoqKiBbaHR0cHM6Ly9hbmd1bGFyLmRldi9vdmVydmlld10oaHR0cHM6Ly9hbmd1bGFyLmRldi9vdmVydmlldykgIAo+ICoqQ29tcGxlamlkYWQ6KiogYGludGVybWVkaWF0ZWAgfCAqKkVzdMOhbmRhcjoqKiBgT0tGIHYxLjAuMGAKCi0tLQoKIyMg8J+TjCBSZXN1bWVuIENvbmNlcHR1YWwgeSBQcm9ww7NzaXRvCkFuZ3VsYXIgZXMgdW4gZnJhbWV3b3JrIGRlIGRlc2Fycm9sbG8gd2ViIG1hbnRlbmlkbyBwb3IgR29vZ2xlIHF1ZSBzZSBjZW50cmEgZW4gbGEgZXNjYWxhYmlsaWRhZCwgcmVhY3RpdmlkYWQgbWVkaWFudGUgU2lnbmFscyB5IGVmaWNpZW5jaWEgbWVkaWFudGUgU2VydmVyLVNpZGUgUmVuZGVyaW5nIChTU1IpLiBFbiBlbnRvcm5vcyBkZSBpbmdlbmllcsOtYSBkZSBzb2Z0d2FyZSwgUHl0aG9uIGFjdMO6YSBjb21vIGVsIG1vdG9yIGRlIGF1dG9tYXRpemFjacOzbiBwYXJhIGdlc3Rpb25hciBlbCBjaWNsbyBkZSB2aWRhIGRlIGVzdGFzIGFwbGljYWNpb25lcywgZmFjaWxpdGFuZG8gZWwgc2NhZmZvbGRpbmcsIGxhIHZhbGlkYWNpw7NuIGRlIGNvbmZpZ3VyYWNpb25lcyBjb21wbGVqYXMgZW4gbW9ub3JlcG9zIHkgbGEgb3JxdWVzdGFjacOzbiBkZSBkZXNwbGllZ3VlcyBvcHRpbWl6YWRvcy4KCmBgYG1lcm1haWQKZ3JhcGggTFIKICAgIElucHV0WyJFbnRyYWRhIC8gQ29uZmlndXJhY2nDs24iXSAtLT4gTG9naWNbIkzDs2dpY2EgZGUgYW5ndWxhci1weXRob24tYXV0b21hdGlvbiJdCiAgICBMb2dpYyAtLT4gT3V0cHV0WyJSZXN1bHRhZG8gVmFsaWRhZG8iXQpgYGAKCi0tLQoKIyMg8J+boO+4jyBSZXF1aXNpdG9zIGRlIEluc3RhbGFjacOzbgpgYGBiYXNoCnBpcCBpbnN0YWxsIHB5ZGFudGljPj0yLjYuMCBhaW9maWxlcz49MjMuMi4xCmBgYAoKLS0tCgojIyDwn5qAIENhc29zIGRlIFVzbyB5IFNjcmlwdHMgTWluaW1hbGlzdGFzCgojIyMgQ2FzbyAxOiBHZW5lcmFkb3IgZGUgU2NhZmZvbGRpbmcgcGFyYSBDb21wb25lbnRlcyBBbmd1bGFyCiogKipFc2NlbmFyaW86KiogQXV0b21hdGl6YXIgbGEgY3JlYWNpw7NuIGRlIGxhIGVzdHJ1Y3R1cmEgZGUgYXJjaGl2b3MgZGUgdW4gY29tcG9uZW50ZSBBbmd1bGFyIChUUywgSFRNTCwgQ1NTKSBzaWd1aWVuZG8gbGFzIG1lam9yZXMgcHLDoWN0aWNhcyBkZSBlbmNhcHN1bGFjacOzbiBtZW5jaW9uYWRhcyBlbiBsYSBkb2N1bWVudGFjacOzbi4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgb3MKZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgpkZWYgY3JlYXRlX2FuZ3VsYXJfY29tcG9uZW50KG5hbWU6IHN0ciwgYmFzZV9wYXRoOiBzdHIgPSAnLi9zcmMvYXBwJykgLT4gTm9uZToKICAgIGNvbXBvbmVudF9kaXIgPSBQYXRoKGJhc2VfcGF0aCkgLyBuYW1lCiAgICBjb21wb25lbnRfZGlyLm1rZGlyKHBhcmVudHM9VHJ1ZSwgZXhpc3Rfb2s9VHJ1ZSkKICAgIAogICAgZmlsZXMgPSB7CiAgICAgICAgZid7bmFtZX0uY29tcG9uZW50LnRzJzogZiJpbXBvcnQgeyB7ICdDb21wb25lbnQnIH0gfSBmcm9tICdAYW5ndWxhci9jb3JlJztcblxuQENvbXBvbmVudCh7XG4gIHNlbGVjdG9yOiAnYXBwLXtuYW1lfScsXG4gIHRlbXBsYXRlVXJsOiAnLi97bmFtZX0uY29tcG9uZW50Lmh0bWwnLFxuICBzdHlsZVVybHM6IFsnLi97bmFtZX0uY29tcG9uZW50LmNzcyddXG59KVxuZXhwb3J0IGNsYXNzIHtuYW1lLmNhcGl0YWxpemUoKX1Db21wb25lbnQgeyB9IiwKICAgICAgICBmJ3tuYW1lfS5jb21wb25lbnQuaHRtbCc6IGYnPCEtLSB7bmFtZX0gd29ya3MhIC0tPicsCiAgICAgICAgZid7bmFtZX0uY29tcG9uZW50LmNzcyc6ICcvKiBTdHlsZXMgKi8nCiAgICB9CiAgICAKICAgIGZvciBmaWxlbmFtZSwgY29udGVudCBpbiBmaWxlcy5pdGVtcygpOgogICAgICAgIChjb21wb25lbnRfZGlyIC8gZmlsZW5hbWUpLndyaXRlX3RleHQoY29udGVudCwgZW5jb2Rpbmc9J3V0Zi04JykKCmlmIF9fbmFtZV9fID09ICdfX21haW5fXyc6CiAgICBjcmVhdGVfYW5ndWxhcl9jb21wb25lbnQoJ3VzZXItcHJvZmlsZScpCmBgYAoKLS0tCgojIyMgQ2FzbyAyOiBWYWxpZGFkb3IgQXPDrW5jcm9ubyBkZSBJbnRlZ3JpZGFkIGRlIFByb3llY3RvcwoqICoqRXNjZW5hcmlvOioqIFZlcmlmaWNhciBkZSBmb3JtYSBhc8OtbmNyb25hIGxhIGV4aXN0ZW5jaWEgZGUgYXJjaGl2b3MgY3LDrXRpY29zIGRlIGNvbmZpZ3VyYWNpw7NuIChhbmd1bGFyLmpzb24sIHBhY2thZ2UuanNvbikgZW4gbcO6bHRpcGxlcyBwcm95ZWN0b3MgZGUgdW4gbW9ub3JlcG8gcGFyYSBhc2VndXJhciBsYSBjb21wYXRpYmlsaWRhZCBjb24gQW5ndWxhciBDTEkuCiogKipDw7NkaWdvIE1pbmltYWxpc3RhOioqCgpgYGBweXRob24KaW1wb3J0IGFzeW5jaW8KaW1wb3J0IGFpb2ZpbGVzCmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aApmcm9tIHR5cGluZyBpbXBvcnQgTGlzdCwgRGljdAoKYXN5bmMgZGVmIGNoZWNrX3Byb2plY3RfaGVhbHRoKHByb2plY3RfcGF0aDogc3RyKSAtPiBEaWN0W3N0ciwgYm9vbF06CiAgICBjcml0aWNhbF9maWxlcyA9IFsnYW5ndWxhci5qc29uJywgJ3BhY2thZ2UuanNvbicsICd0c2NvbmZpZy5qc29uJ10KICAgIHJlc3VsdHMgPSB7fQogICAgZm9yIGZpbGUgaW4gY3JpdGljYWxfZmlsZXM6CiAgICAgICAgZmlsZV9wYXRoID0gUGF0aChwcm9qZWN0X3BhdGgpIC8gZmlsZQogICAgICAgIHJlc3VsdHNbZmlsZV0gPSBmaWxlX3BhdGguZXhpc3RzKCkKICAgIHJldHVybiByZXN1bHRzCgphc3luYyBkZWYgYXVkaXRfbW9ub3JlcG8ocGF0aHM6IExpc3Rbc3RyXSk6CiAgICB0YXNrcyA9IFtjaGVja19wcm9qZWN0X2hlYWx0aChwKSBmb3IgcCBpbiBwYXRoc10KICAgIHJldHVybiBhd2FpdCBhc3luY2lvLmdhdGhlcigqdGFza3MpCgppZiBfX25hbWVfXyA9PSAnX19tYWluX18nOgogICAgcHJvamVjdHMgPSBbJy4vYXBwcy9hZG1pbi1wYW5lbCcsICcuL2FwcHMvY3VzdG9tZXItcG9ydGFsJ10KICAgIGhlYWx0aF9yZXBvcnQgPSBhc3luY2lvLnJ1bihhdWRpdF9tb25vcmVwbyhwcm9qZWN0cykpCiAgICBwcmludChmJ0F1ZGl0IFJlcG9ydDoge2hlYWx0aF9yZXBvcnR9JykKYGBgCgotLS0KCiMjIyBDYXNvIDM6IFZhbGlkYWRvciBkZSBDb25maWd1cmFjacOzbiBTU1IgcGFyYSBQcm9kdWNjacOzbgoqICoqRXNjZW5hcmlvOioqIEltcGxlbWVudGFyIHVuIHBhdHLDs24gZGUgdmFsaWRhY2nDs24gcm9idXN0byB1c2FuZG8gUHlkYW50aWMgcGFyYSBhc2VndXJhciBxdWUgbGEgY29uZmlndXJhY2nDs24gZGUgU2VydmVyLVNpZGUgUmVuZGVyaW5nIChTU1IpIGVuIGFuZ3VsYXIuanNvbiBjdW1wbGUgY29uIGxvcyBlc3TDoW5kYXJlcyBkZSBwcm9kdWNjacOzbiBhbnRlcyBkZWwgZGVzcGxpZWd1ZS4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgpmcm9tIHB5ZGFudGljIGltcG9ydCBCYXNlTW9kZWwsIEZpZWxkLCBWYWxpZGF0aW9uRXJyb3IKZnJvbSB0eXBpbmcgaW1wb3J0IERpY3QsIEFueQppbXBvcnQganNvbgoKY2xhc3MgQW5ndWxhclByb2plY3RDb25maWcoQmFzZU1vZGVsKToKICAgIHByb2plY3RfdHlwZTogc3RyID0gRmllbGQoLi4uLCBwYXR0ZXJuPSdeYXBwbGljYXRpb24kJykKICAgIHNzcl9lbmFibGVkOiBib29sID0gRmllbGQoYWxpYXM9J3NzcicsIGRlZmF1bHQ9RmFsc2UpCiAgICBvcHRpbWl6YXRpb246IGJvb2wgPSBUcnVlCgpkZWYgdmFsaWRhdGVfc3NyX2NvbmZpZyhjb25maWdfZGF0YTogRGljdFtzdHIsIEFueV0pOgogICAgdHJ5OgogICAgICAgICMgU2ltdWxhY2nDs24gZGUgbGVjdHVyYSBkZSBzZWNjacOzbiAnYXJjaGl0ZWN0JyBkZSBhbmd1bGFyLmpzb24KICAgICAgICBwcm9qZWN0ID0gQW5ndWxhclByb2plY3RDb25maWcoKipjb25maWdfZGF0YSkKICAgICAgICBpZiBwcm9qZWN0LnNzcl9lbmFibGVkIGFuZCBwcm9qZWN0Lm9wdGltaXphdGlvbjoKICAgICAgICAgICAgcmV0dXJuICJDb25maWd1cmFjacOzbiBTU1IgdsOhbGlkYSBwYXJhIHByb2R1Y2Npw7NuLiIKICAgICAgICByZXR1cm4gIlNTUiBubyBjb25maWd1cmFkbyBvIHNpbiBvcHRpbWl6YWNpb25lcy4iCiAgICBleGNlcHQgVmFsaWRhdGlvbkVycm9yIGFzIGU6CiAgICAgICAgcmV0dXJuIGYiRXJyb3IgZGUgY29uZmlndXJhY2nDs246IHtlLmpzb24oKX0iCgppZiBfX25hbWVfXyA9PSAnX19tYWluX18nOgogICAgcmF3X2NvbmZpZyA9IHsicHJvamVjdF90eXBlIjogImFwcGxpY2F0aW9uIiwgInNzciI6IFRydWUsICJvcHRpbWl6YXRpb24iOiBUcnVlfQogICAgcHJpbnQodmFsaWRhdGVfc3NyX2NvbmZpZyhyYXdfY29uZmlnKSkKYGBgCgotLS0KCgojIyDimqDvuI8gQ29uc2lkZXJhY2lvbmVzIFTDqWNuaWNhcyB5IEdvdGNoYXMKKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIFV0aWxpemFyIFBhdGhsaWIgcGFyYSBsYSBtYW5pcHVsYWNpw7NuIGRlIHJ1dGFzIGRlIGFyY2hpdm9zIGRlIGZvcm1hIGFnbsOzc3RpY2EgYWwgc2lzdGVtYSBvcGVyYXRpdm8uCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBJbXBsZW1lbnRhciB2YWxpZGFjaW9uZXMgZGUgZXNxdWVtYSAoUHlkYW50aWMpIHBhcmEgYXJjaGl2b3MgZGUgY29uZmlndXJhY2nDs24gSlNPTiBkZSBBbmd1bGFyLgoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogQXV0b21hdGl6YXIgdGFyZWFzIHJlcGV0aXRpdmFzIGRlIEFuZ3VsYXIgQ0xJIG1lZGlhbnRlIHNjcmlwdHMgZGUgUHl0aG9uIHBhcmEgcGlwZWxpbmVzIGRlIENJL0NELgoqICoqR290Y2hhL0FsZXJ0YToqKiBObyBtYW5lamFyIGV4Y2VwY2lvbmVzIGRlIHBlcm1pc29zIGRlIGVzY3JpdHVyYSBhbCBnZW5lcmFyIHNjYWZmb2xkaW5nIGRlIGNvbXBvbmVudGVzLgoqICoqR290Y2hhL0FsZXJ0YToqKiBJZ25vcmFyIGxhIGNvZGlmaWNhY2nDs24gVVRGLTggYWwgbGVlciBvIGVzY3JpYmlyIGFyY2hpdm9zIGRlIFR5cGVTY3JpcHQvSFRNTC4KKiAqKkdvdGNoYS9BbGVydGE6KiogSGFyZGNvZGVhciBydXRhcyBxdWUgZGVwZW5kZW4gZGUgbGEgZXN0cnVjdHVyYSBpbnRlcm5hIGRlIG5vZGVfbW9kdWxlcy4KCi0tLQoKIyMg8J+UlyBOb2RvcyBSZWxhY2lvbmFkb3MgZW4gZWwgR3JhZm8KKiBbWzAwX0luZGljZV9GYWJyaWNhfE1PQyBDZW50cmFsXV0KKiBbWzAyX0Nhc29zX2RlX1Vzby8wMl9JbmRpY2VfQ2Fzb3NfZGVfVXNvfMONbmRpY2UgZGUgQ2Fzb3MgZGUgVXNvXV0KKiBbWzAxX1NraWxscy8wMV9JbmRpY2VfU2tpbGxzfMONbmRpY2UgZGUgU2tpbGxzXV0K" download="CU_015_angular-python-automation.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>Angular es un framework de desarrollo web mantenido por Google que se centra en la escalabilidad, reactividad mediante Signals y eficiencia mediante Server-Side Rendering (SSR). En entornos de ingeniería de software, Python actúa como el motor de automatización para gestionar el ciclo de vida de estas aplicaciones, facilitando el scaffolding, la validación de configuraciones complejas en monorepos y la orquestación de despliegues optimizados.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Generador de Scaffolding para Componentes Angular</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Automatizar la creación de la estructura de archivos de un componente Angular (TS, HTML, CSS) siguiendo las mejores prácticas de encapsulación mencionadas en la documentación.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import os
+from pathlib import Path
+
+def create_angular_component(name: str, base_path: str = './src/app') -&gt; None:
+    component_dir = Path(base_path) / name
+    component_dir.mkdir(parents=True, exist_ok=True)
+    
+    files = {
+        f'{name}.component.ts': f"import { { 'Component' } } from '@angular/core';\n\n@Component({\n  selector: 'app-{name}',\n  templateUrl: './{name}.component.html',\n  styleUrls: ['./{name}.component.css']\n})\nexport class {name.capitalize()}Component { }",
+        f'{name}.component.html': f'&lt;!-- {name} works! --&gt;',
+        f'{name}.component.css': '/* Styles */'
+    }
+    
+    for filename, content in files.items():
+        (component_dir / filename).write_text(content, encoding='utf-8')
+
+if __name__ == '__main__':
+    create_angular_component('user-profile')</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Validador Asíncrono de Integridad de Proyectos</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Verificar de forma asíncrona la existencia de archivos críticos de configuración (angular.json, package.json) en múltiples proyectos de un monorepo para asegurar la compatibilidad con Angular CLI.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import asyncio
+import aiofiles
+from pathlib import Path
+from typing import List, Dict
+
+async def check_project_health(project_path: str) -&gt; Dict[str, bool]:
+    critical_files = ['angular.json', 'package.json', 'tsconfig.json']
+    results = {}
+    for file in critical_files:
+        file_path = Path(project_path) / file
+        results[file] = file_path.exists()
+    return results
+
+async def audit_monorepo(paths: List[str]):
+    tasks = [check_project_health(p) for p in paths]
+    return await asyncio.gather(*tasks)
+
+if __name__ == '__main__':
+    projects = ['./apps/admin-panel', './apps/customer-portal']
+    health_report = asyncio.run(audit_monorepo(projects))
+    print(f'Audit Report: {health_report}')</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Validador de Configuración SSR para Producción</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementar un patrón de validación robusto usando Pydantic para asegurar que la configuración de Server-Side Rendering (SSR) en angular.json cumple con los estándares de producción antes del despliegue.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from pydantic import BaseModel, Field, ValidationError
+from typing import Dict, Any
+import json
+
+class AngularProjectConfig(BaseModel):
+    project_type: str = Field(..., pattern='^application$')
+    ssr_enabled: bool = Field(alias='ssr', default=False)
+    optimization: bool = True
+
+def validate_ssr_config(config_data: Dict[str, Any]):
+    try:
+        # Simulación de lectura de sección 'architect' de angular.json
+        project = AngularProjectConfig(**config_data)
+        if project.ssr_enabled and project.optimization:
+            return "Configuración SSR válida para producción."
+        return "SSR no configurado o sin optimizaciones."
+    except ValidationError as e:
+        return f"Error de configuración: {e.json()}"
+
+if __name__ == '__main__':
+    raw_config = {"project_type": "application", "ssr": True, "optimization": True}
+    print(validate_ssr_config(raw_config))</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar Pathlib para la manipulación de rutas de archivos de forma agnóstica al sistema operativo.</li><li>✅ <strong>Práctica:</strong> Implementar validaciones de esquema (Pydantic) para archivos de configuración JSON de Angular.</li><li>✅ <strong>Práctica:</strong> Automatizar tareas repetitivas de Angular CLI mediante scripts de Python para pipelines de CI/CD.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> No manejar excepciones de permisos de escritura al generar scaffolding de componentes.</li><li>⚠️ <strong>Alerta:</strong> Ignorar la codificación UTF-8 al leer o escribir archivos de TypeScript/HTML.</li><li>⚠️ <strong>Alerta:</strong> Hardcodear rutas que dependen de la estructura interna de node_modules.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Fábrica de Software Autónoma | Grafo de Conocimiento Interoperable (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatización y Procesamiento de CSS con Python — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">Automatización y Procesamiento de CSS con Python</h1>
+            <p>Documentación analizada por el Agente Scraper (Fábrica de Software)</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <a href="#" target="_blank" style="color: #818cf8; text-decoration: none;">Documentación Oficial ↗</a></span>
+                <span>📦 Dependencias: <code>cssutils>=2.9.0 tinycss2>=1.2.1</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#css</span><span class="tag">#web-development</span><span class="tag">#automation</span><span class="tag">#caso-de-uso</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMTQtUFlUSE9OLUNTUy1BVVRPTUFUSU9OCnRpdGxlOiBBdXRvbWF0aXphY2nDs24geSBQcm9jZXNhbWllbnRvIGRlIENTUyBjb24gUHl0aG9uCnR5cGU6IHVzZS1jYXNlCnZlcnNpb246IDEuMC4wCnN0YXR1czogYWN0aXZlCmNyZWF0ZWRfYXQ6ICcyMDI2LTA4LTI5VDE5OjQ4OjU2LjUxMTAxMS0wNTowMCcKdXBkYXRlZF9hdDogJzIwMjYtMDgtMjlUMTk6NDg6NTYuNTExMDExLTA1OjAwJwpzb3VyY2VfdXJsOiBodHRwczovL2RldmVsb3Blci5tb3ppbGxhLm9yZy9lcy9kb2NzL1dlYi9DU1MKdGFnczoKLSBweXRob24KLSBjc3MKLSB3ZWItZGV2ZWxvcG1lbnQKLSBhdXRvbWF0aW9uCi0gY2Fzby1kZS11c28Kc2tpbGxzX3JlcXVpcmVkOgotIDAxX1NraWxscy9TS0lMTC0wMDEtU0NSQVBJTkctRVhUUkFDQ0lPTi1XRUIKZGVwZW5kZW5jaWVzOgotIGNzc3V0aWxzPj0yLjkuMAotIHRpbnljc3MyPj0xLjIuMQpjb21wbGV4aXR5OiBpbnRlcm1lZGlhdGUKc2VtYW50aWNfc3VtbWFyeTogQ1NTIChDYXNjYWRpbmcgU3R5bGUgU2hlZXRzKSBlcyBlbCBsZW5ndWFqZSBlc3TDoW5kYXIgcGFyYSBkZWZpbmlyCiAgbGEgcHJlc2VudGFjacOzbiBkZSBkb2N1bWVudG9zIGVzdHJ1Y3R1cmFkb3MuIEVuIGVudG9ybm9zIGRlIGRlc2Fycm9sbG8gY29uIFB5dGhvbiwKICBzdSBtYW5pcHVsYWNpw7NuIGVzIGZ1bmRhbWVudGFsIHBhcmEgbGEgZ2VuZXJhY2nDs24gZGluw6FtaWNhIGRlIGludGVyZmFjZXMsIGxhIHZhbGlkYWNpw7NuCiAgZGUgaG9qYXMgZGUgZXN0aWxvIGVuIHBpcGVsaW5lcyBkZSBDSS9DRCB5IGxhIG9wdGltaXphY2nDs24gZGUgYWN0aXZvcyB3ZWIgbWVkaWFudGUKICBlbCBhbsOhbGlzaXMgZGUgc2VsZWN0b3JlcyB5IHByb3BpZWRhZGVzLgotLS0KCiMg8J+SoSBBdXRvbWF0aXphY2nDs24geSBQcm9jZXNhbWllbnRvIGRlIENTUyBjb24gUHl0aG9uCgo+ICoqT3JpZ2VuOioqIFtodHRwczovL2RldmVsb3Blci5tb3ppbGxhLm9yZy9lcy9kb2NzL1dlYi9DU1NdKGh0dHBzOi8vZGV2ZWxvcGVyLm1vemlsbGEub3JnL2VzL2RvY3MvV2ViL0NTUykgIAo+ICoqQ29tcGxlamlkYWQ6KiogYGludGVybWVkaWF0ZWAgfCAqKkVzdMOhbmRhcjoqKiBgT0tGIHYxLjAuMGAKCi0tLQoKIyMg8J+TjCBSZXN1bWVuIENvbmNlcHR1YWwgeSBQcm9ww7NzaXRvCkNTUyAoQ2FzY2FkaW5nIFN0eWxlIFNoZWV0cykgZXMgZWwgbGVuZ3VhamUgZXN0w6FuZGFyIHBhcmEgZGVmaW5pciBsYSBwcmVzZW50YWNpw7NuIGRlIGRvY3VtZW50b3MgZXN0cnVjdHVyYWRvcy4gRW4gZW50b3Jub3MgZGUgZGVzYXJyb2xsbyBjb24gUHl0aG9uLCBzdSBtYW5pcHVsYWNpw7NuIGVzIGZ1bmRhbWVudGFsIHBhcmEgbGEgZ2VuZXJhY2nDs24gZGluw6FtaWNhIGRlIGludGVyZmFjZXMsIGxhIHZhbGlkYWNpw7NuIGRlIGhvamFzIGRlIGVzdGlsbyBlbiBwaXBlbGluZXMgZGUgQ0kvQ0QgeSBsYSBvcHRpbWl6YWNpw7NuIGRlIGFjdGl2b3Mgd2ViIG1lZGlhbnRlIGVsIGFuw6FsaXNpcyBkZSBzZWxlY3RvcmVzIHkgcHJvcGllZGFkZXMuCgpgYGBtZXJtYWlkCmdyYXBoIExSCiAgICBJbnB1dFsiRW50cmFkYSAvIENvbmZpZ3VyYWNpw7NuIl0gLS0+IExvZ2ljWyJMw7NnaWNhIGRlIHB5dGhvbi1jc3MtYXV0b21hdGlvbiJdCiAgICBMb2dpYyAtLT4gT3V0cHV0WyJSZXN1bHRhZG8gVmFsaWRhZG8iXQpgYGAKCi0tLQoKIyMg8J+boO+4jyBSZXF1aXNpdG9zIGRlIEluc3RhbGFjacOzbgpgYGBiYXNoCnBpcCBpbnN0YWxsIGNzc3V0aWxzPj0yLjkuMCB0aW55Y3NzMj49MS4yLjEKYGBgCgotLS0KCiMjIPCfmoAgQ2Fzb3MgZGUgVXNvIHkgU2NyaXB0cyBNaW5pbWFsaXN0YXMKCiMjIyBDYXNvIDE6IEdlbmVyYWNpw7NuIERpbsOhbWljYSBkZSBFc3RpbG9zIChRdWlja3N0YXJ0KQoqICoqRXNjZW5hcmlvOioqIEdlbmVyYXIgdW5hIGhvamEgZGUgZXN0aWxvIGLDoXNpY2EgYmFzYWRhIGVuIHBhcsOhbWV0cm9zIGRlIGNvbmZpZ3VyYWNpw7NuIHBhcmEgdW4gc2lzdGVtYSBkZSByZXBvcnRlcyBIVE1MLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmRlZiBnZW5lcmF0ZV9keW5hbWljX2NzcyhwcmltYXJ5X2NvbG9yOiBzdHIsIGZvbnRfc2l6ZTogaW50KSAtPiBzdHI6CiAgICAiIiJHZW5lcmEgdW4gc3RyaW5nIENTUyB2w6FsaWRvIGJhc2FkbyBlbiB2YXJpYWJsZXMgZGUgZW50cmFkYS4iIiIKICAgIHRlbXBsYXRlID0gZiIiIgogICAgOnJvb3Qge3sKICAgICAgICAtLW1haW4tY29sb3I6IHtwcmltYXJ5X2NvbG9yfTsKICAgICAgICAtLWJhc2Utc2l6ZToge2ZvbnRfc2l6ZX1weDsKICAgIH19CiAgICBib2R5IHt7CiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbWFpbi1jb2xvcik7CiAgICAgICAgZm9udC1zaXplOiB2YXIoLS1iYXNlLXNpemUpOwogICAgICAgIG1hcmdpbjogMDsKICAgIH19CiAgICAiIiIKICAgIHJldHVybiB0ZW1wbGF0ZS5zdHJpcCgpCgppZiBfX25hbWVfXyA9PSAnX19tYWluX18nOgogICAgY3NzX291dHB1dCA9IGdlbmVyYXRlX2R5bmFtaWNfY3NzKCcjMzQ5OGRiJywgMTYpCiAgICBwcmludChjc3Nfb3V0cHV0KQpgYGAKCi0tLQoKIyMjIENhc28gMjogVmFsaWRhY2nDs24gZGUgU2ludGF4aXMgeSBNYW5lam8gZGUgRXJyb3JlcwoqICoqRXNjZW5hcmlvOioqIFZhbGlkYXIgc2kgdW4gYXJjaGl2byBDU1MgZXh0ZXJubyBjdW1wbGUgY29uIGxhcyBlc3BlY2lmaWNhY2lvbmVzIGVzdMOhbmRhciBhbnRlcyBkZSBzZXIgcHJvY2VzYWRvIHBvciB1biBtb3RvciBkZSByZW5kZXJpemFkby4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgY3NzdXRpbHMKaW1wb3J0IGxvZ2dpbmcKCmRlZiB2YWxpZGF0ZV9jc3NfY29udGVudChjc3NfdGV4dDogc3RyKSAtPiBib29sOgogICAgIiIiVmFsaWRhIGxhIHNpbnRheGlzIENTUyB5IGNhcHR1cmEgZXJyb3JlcyBkZSBwYXJzZW8uIiIiCiAgICBwYXJzZXIgPSBjc3N1dGlscy5DU1NQYXJzZXIocmFpc2VFeGNlcHRpb25zPVRydWUpCiAgICAjIERlc2FjdGl2YXIgbG9ncyBpbm5lY2VzYXJpb3MgZGUgbGEgbGlicmVyw61hCiAgICBjc3N1dGlscy5sb2cuc2V0TGV2ZWwobG9nZ2luZy5DUklUSUNBTCkKICAgIAogICAgdHJ5OgogICAgICAgIHNoZWV0ID0gcGFyc2VyLnBhcnNlU3RyaW5nKGNzc190ZXh0KQogICAgICAgIHJldHVybiBzaGVldC52YWxpZAogICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHByaW50KGYiRXJyb3IgZGUgc2ludGF4aXMgZGV0ZWN0YWRvOiB7ZX0iKQogICAgICAgIHJldHVybiBGYWxzZQoKYmFkX2NzcyA9ICJib2R5IHsgY29sb3I6IHJlZDsgZm9udC1zaXplOiAxMnB4OyBpbnZhbGlkLXByb3A6IGVycm9yOyAiCnByaW50KGYiwr9FcyB2w6FsaWRvPzoge3ZhbGlkYXRlX2Nzc19jb250ZW50KGJhZF9jc3MpfSIpCmBgYAoKLS0tCgojIyMgQ2FzbyAzOiBQcm9jZXNhZG9yIGRlIFRlbWFzIHkgTWluaWZpY2FjacOzbiAoUGF0csOzbiBQcm9kdWNjacOzbikKKiAqKkVzY2VuYXJpbzoqKiBJbXBsZW1lbnRhciB1biBtb3RvciBkZSBpbnllY2Npw7NuIGRlIHZhcmlhYmxlcyB5IG1pbmlmaWNhY2nDs24gYsOhc2ljYSBwYXJhIHVuIHBpcGVsaW5lIGRlIGRlc3BsaWVndWUgZGUgYWN0aXZvcyBlc3TDoXRpY29zLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmltcG9ydCByZQpmcm9tIHR5cGluZyBpbXBvcnQgRGljdAoKY2xhc3MgQ1NTUHJvY2Vzc29yOgogICAgIiIiUHJvY2VzYWRvciBhdmFuemFkbyBwYXJhIG1hbmlwdWxhY2nDs24gZGUgdGVtYXMgeSBvcHRpbWl6YWNpw7NuLiIiIgogICAgCiAgICBkZWYgX19pbml0X18oc2VsZiwgcmF3X2Nzczogc3RyKToKICAgICAgICBzZWxmLnJhd19jc3MgPSByYXdfY3NzCgogICAgZGVmIGluamVjdF90aGVtZShzZWxmLCB2YXJpYWJsZXM6IERpY3Rbc3RyLCBzdHJdKSAtPiBzdHI6CiAgICAgICAgIiIiUmVlbXBsYXphIHBsYWNlaG9sZGVycyBkZSB2YXJpYWJsZXMgZW4gZWwgQ1NTLiIiIgogICAgICAgIHByb2Nlc3NlZCA9IHNlbGYucmF3X2NzcwogICAgICAgIGZvciBrZXksIHZhbHVlIGluIHZhcmlhYmxlcy5pdGVtcygpOgogICAgICAgICAgICBwcm9jZXNzZWQgPSBwcm9jZXNzZWQucmVwbGFjZShmInt7e3t7a2V5fX19fX0iLCB2YWx1ZSkKICAgICAgICByZXR1cm4gcHJvY2Vzc2VkCgogICAgZGVmIG1pbmlmeShzZWxmLCBjc3M6IHN0cikgLT4gc3RyOgogICAgICAgICIiIkVsaW1pbmEgZXNwYWNpb3MgZW4gYmxhbmNvIHkgc2FsdG9zIGRlIGzDrW5lYSBpbm5lY2VzYXJpb3MuIiIiCiAgICAgICAgY3NzID0gcmUuc3ViKHInXC9cKi4qP1wqXC8nLCAnJywgY3NzLCBmbGFncz1yZS5ET1RBTEwpICAjIENvbWVudGFyaW9zCiAgICAgICAgY3NzID0gcmUuc3ViKHInXHMrJywgJyAnLCBjc3MpICAjIEVzcGFjaW9zIG3Dumx0aXBsZXMKICAgICAgICByZXR1cm4gY3NzLnJlcGxhY2UoJ3sgJywgJ3snKS5yZXBsYWNlKCcgfScsICd9JykucmVwbGFjZSgnOyAnLCAnOycpLnN0cmlwKCkKCiMgVXNvIGVuIHByb2R1Y2Npw7NuCnJhd19zdHlsZSA9ICJib2R5IHsgY29sb3I6IHt7dGV4dF9jb2xvcn19OyB9IC8qIENvbWVudGFyaW8gKi8gLmNvbnRhaW5lciB7IG1hcmdpbjogMTBweDsgfSIKcHJvY2Vzc29yID0gQ1NTUHJvY2Vzc29yKHJhd19zdHlsZSkKdGhlbWVkX2NzcyA9IHByb2Nlc3Nvci5pbmplY3RfdGhlbWUoeyJ0ZXh0X2NvbG9yIjogIiMzMzMifSkKZmluYWxfY3NzID0gcHJvY2Vzc29yLm1pbmlmeSh0aGVtZWRfY3NzKQpwcmludChmIkNTUyBGaW5hbDoge2ZpbmFsX2Nzc30iKQpgYGAKCi0tLQoKCiMjIOKaoO+4jyBDb25zaWRlcmFjaW9uZXMgVMOpY25pY2FzIHkgR290Y2hhcwoqICoqQnVlbmFzIFByw6FjdGljYXM6KiogVXRpbGl6YXIgbGlicmVyw61hcyBlc3BlY2lhbGl6YWRhcyBjb21vIGNzc3V0aWxzIHBhcmEgdmFsaWRhY2nDs24gZW4gbHVnYXIgZGUgZXhwcmVzaW9uZXMgcmVndWxhcmVzIGNvbXBsZWphcy4KKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIEltcGxlbWVudGFyIHVuIHNpc3RlbWEgZGUgbG9nZ2luZyBwYXJhIGNhcHR1cmFyIHByb3BpZWRhZGVzIENTUyBubyBzb3BvcnRhZGFzIG8gZXJyb3JlcyBkZSBwYXJzZW8uCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBTZXBhcmFyIGxhIGzDs2dpY2EgZGUgZ2VuZXJhY2nDs24gZGUgZXN0aWxvcyBkZSBsYSBsw7NnaWNhIGRlIG5lZ29jaW8gZGUgbGEgYXBsaWNhY2nDs24uCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBNaW5pZmljYXIgZWwgQ1NTIHJlc3VsdGFudGUgYW50ZXMgZGUgc2VydmlybG8gZW4gZW50b3Jub3MgZGUgcHJvZHVjY2nDs24gcGFyYSByZWR1Y2lyIGxhdGVuY2lhLgoqICoqR290Y2hhL0FsZXJ0YToqKiBJbnRlbnRhciBwYXJzZWFyIENTUyBjb21wbGVqbyB1c2FuZG8gc29sbyBzdHJpbmdzLCBsbyBxdWUgaWdub3JhIHJlZ2xhcyBkZSBlc3BlY2lmaWNpZGFkIHkgaGVyZW5jaWEuCiogKipHb3RjaGEvQWxlcnRhOioqIE5vIG1hbmVqYXIgZXhjZXBjaW9uZXMgYWwgcHJvY2VzYXIgYXJjaGl2b3MgQ1NTIGV4dGVybm9zIHF1ZSBwdWVkZW4gY29udGVuZXIgc2ludGF4aXMgbWFsZm9ybWFkYS4KKiAqKkdvdGNoYS9BbGVydGE6KiogSWdub3JhciBsb3MgcHJlZmlqb3MgZGUgbG9zIG5hdmVnYWRvcmVzICgtd2Via2l0LCAtbW96KSBhbCByZWFsaXphciB2YWxpZGFjaW9uZXMgZXN0cmljdGFzLgoKLS0tCgojIyDwn5SXIE5vZG9zIFJlbGFjaW9uYWRvcyBlbiBlbCBHcmFmbwoqIFtbMDBfSW5kaWNlX0ZhYnJpY2F8TU9DIENlbnRyYWxdXQoqIFtbMDJfQ2Fzb3NfZGVfVXNvLzAyX0luZGljZV9DYXNvc19kZV9Vc298w41uZGljZSBkZSBDYXNvcyBkZSBVc29dXQoqIFtbMDFfU2tpbGxzLzAxX0luZGljZV9Ta2lsbHN8w41uZGljZSBkZSBTa2lsbHNdXQo=" download="CU_014_python-css-automation.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Conceptual</h2>
+            <p>CSS (Cascading Style Sheets) es el lenguaje estándar para definir la presentación de documentos estructurados. En entornos de desarrollo con Python, su manipulación es fundamental para la generación dinámica de interfaces, la validación de hojas de estilo en pipelines de CI/CD y la optimización de activos web mediante el análisis de selectores y propiedades.</p>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Generación Dinámica de Estilos (Quickstart)</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Generar una hoja de estilo básica basada en parámetros de configuración para un sistema de reportes HTML.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">def generate_dynamic_css(primary_color: str, font_size: int) -&gt; str:
+    """Genera un string CSS válido basado en variables de entrada."""
+    template = f"""
+    :root {{
+        --main-color: {primary_color};
+        --base-size: {font_size}px;
+    }}
+    body {{
+        background-color: var(--main-color);
+        font-size: var(--base-size);
+        margin: 0;
+    }}
+    """
+    return template.strip()
+
+if __name__ == '__main__':
+    css_output = generate_dynamic_css('#3498db', 16)
+    print(css_output)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Validación de Sintaxis y Manejo de Errores</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Validar si un archivo CSS externo cumple con las especificaciones estándar antes de ser procesado por un motor de renderizado.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import cssutils
+import logging
+
+def validate_css_content(css_text: str) -&gt; bool:
+    """Valida la sintaxis CSS y captura errores de parseo."""
+    parser = cssutils.CSSParser(raiseExceptions=True)
+    # Desactivar logs innecesarios de la librería
+    cssutils.log.setLevel(logging.CRITICAL)
+    
+    try:
+        sheet = parser.parseString(css_text)
+        return sheet.valid
+    except Exception as e:
+        print(f"Error de sintaxis detectado: {e}")
+        return False
+
+bad_css = "body { color: red; font-size: 12px; invalid-prop: error; "
+print(f"¿Es válido?: {validate_css_content(bad_css)}")</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Procesador de Temas y Minificación (Patrón Producción)</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementar un motor de inyección de variables y minificación básica para un pipeline de despliegue de activos estáticos.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import re
+from typing import Dict
+
+class CSSProcessor:
+    """Procesador avanzado para manipulación de temas y optimización."""
+    
+    def __init__(self, raw_css: str):
+        self.raw_css = raw_css
+
+    def inject_theme(self, variables: Dict[str, str]) -&gt; str:
+        """Reemplaza placeholders de variables en el CSS."""
+        processed = self.raw_css
+        for key, value in variables.items():
+            processed = processed.replace(f"{{{{{key}}}}}", value)
+        return processed
+
+    def minify(self, css: str) -&gt; str:
+        """Elimina espacios en blanco y saltos de línea innecesarios."""
+        css = re.sub(r'\/\*.*?\*\/', '', css, flags=re.DOTALL)  # Comentarios
+        css = re.sub(r'\s+', ' ', css)  # Espacios múltiples
+        return css.replace('{ ', '{').replace(' }', '}').replace('; ', ';').strip()
+
+# Uso en producción
+raw_style = "body { color: {{text_color}}; } /* Comentario */ .container { margin: 10px; }"
+processor = CSSProcessor(raw_style)
+themed_css = processor.inject_theme({"text_color": "#333"})
+final_css = processor.minify(themed_css)
+print(f"CSS Final: {final_css}")</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar librerías especializadas como cssutils para validación en lugar de expresiones regulares complejas.</li><li>✅ <strong>Práctica:</strong> Implementar un sistema de logging para capturar propiedades CSS no soportadas o errores de parseo.</li><li>✅ <strong>Práctica:</strong> Separar la lógica de generación de estilos de la lógica de negocio de la aplicación.</li><li>✅ <strong>Práctica:</strong> Minificar el CSS resultante antes de servirlo en entornos de producción para reducir latencia.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> Intentar parsear CSS complejo usando solo strings, lo que ignora reglas de especificidad y herencia.</li><li>⚠️ <strong>Alerta:</strong> No manejar excepciones al procesar archivos CSS externos que pueden contener sintaxis malformada.</li><li>⚠️ <strong>Alerta:</strong> Ignorar los prefijos de los navegadores (-webkit, -moz) al realizar validaciones estrictas.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Fábrica de Software Autónoma | Grafo de Conocimiento Interoperable (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

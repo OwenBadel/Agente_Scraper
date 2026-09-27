@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integración y Operación con MongoDB utilizando PyMongo — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Integración y Operación con MongoDB utilizando PyMongo</h1>
+            <p>Documentación técnica analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">intermediate</span>
+                <span>🌐 <strong>Documentación Oficial:</strong> <a href="https://www.mongodb.com/es/docs/" target="_blank" style="color: #79f2f0; text-decoration: underline; font-family: monospace;">https://www.mongodb.com/es/docs/ ↗</a></span>
+                <span>📦 Dependencias: <code>pymongo>=4.6.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#pymongo</span><span class="tag">#mongodb</span><span class="tag">#database</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0 (Obsidian)</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wNDItTU9OR09EQi1QWU1PTkdPLUlOVEVHUkFUSU9OCnRpdGxlOiBJbnRlZ3JhY2nDs24geSBPcGVyYWNpw7NuIGNvbiBNb25nb0RCIHV0aWxpemFuZG8gUHlNb25nbwp0eXBlOiB1c2UtY2FzZQp2ZXJzaW9uOiAxLjAuMApzdGF0dXM6IGFjdGl2ZQpjcmVhdGVkX2F0OiAnMjAyNi0wOS0wNVQwOToyMToxNy40OTA3MjMtMDU6MDAnCnVwZGF0ZWRfYXQ6ICcyMDI2LTA5LTA1VDA5OjIxOjE3LjQ5MDcyMy0wNTowMCcKc291cmNlX3VybDogaHR0cHM6Ly93d3cubW9uZ29kYi5jb20vZXMvZG9jcy8KdGFnczoKLSBweXRob24KLSBweW1vbmdvCi0gbW9uZ29kYgotIGRhdGFiYXNlCi0gY2Fzby1kZS11c28Kc2tpbGxzX3JlcXVpcmVkOgotICdbWzAxX1NraWxscy9TS0lMTF8wMDFfU2NyYXBpbmdfeV9FeHRyYWNjaW9uX1dlYnxTY3JhcGluZyB5IEV4dHJhY2Npw7NuIFdlYl1dJwpkZXBlbmRlbmNpZXM6Ci0gcHltb25nbz49NC42LjAKY29tcGxleGl0eTogaW50ZXJtZWRpYXRlCnNlbWFudGljX3N1bW1hcnk6IE1vbmdvREIgZXMgdW5hIGJhc2UgZGUgZGF0b3Mgb3JpZW50YWRhIGEgZG9jdW1lbnRvcyBkaXNlw7FhZGEgcGFyYQogIGFwbGljYWNpb25lcyBtb2Rlcm5hcy4gUGVybWl0ZSBhbG1hY2VuYXIgZG9jdW1lbnRvcyBKU09OIGVucmlxdWVjaWRvcyBxdWUgc2UgbWFwZWFuCiAgZGUgZm9ybWEgbmF0dXJhbCBhIG9iamV0b3MgZGUgY8OzZGlnbywgcHJvcG9yY2lvbmFuZG8gY2FwYWNpZGFkZXMgYXZhbnphZGFzIGNvbW8KICBjb25zaXN0ZW5jaWEgQUNJRCwgdHJhbnNhY2Npb25lcywgaW5kZXhhY2nDs24gZ2VvZXNwYWNpYWwgeSBiw7pzcXVlZGFzIHZlY3RvcmlhbGVzCiAgYSB0cmF2w6lzIGRlIGNvbnRyb2xhZG9yZXMgb2ZpY2lhbGVzIGNvbW8gUHlNb25nby4KLS0tCgojIPCfkqEgSW50ZWdyYWNpw7NuIHkgT3BlcmFjacOzbiBjb24gTW9uZ29EQiB1dGlsaXphbmRvIFB5TW9uZ28KCj4gKipPcmlnZW46KiogW2h0dHBzOi8vd3d3Lm1vbmdvZGIuY29tL2VzL2RvY3MvXShodHRwczovL3d3dy5tb25nb2RiLmNvbS9lcy9kb2NzLykgIAo+ICoqQ29tcGxlamlkYWQ6KiogYGludGVybWVkaWF0ZWAgfCAqKkVzdMOhbmRhcjoqKiBgT0tGIHYxLjAuMGAKCi0tLQoKIyMg8J+TjCBSZXN1bWVuIENvbmNlcHR1YWwgeSBQcm9ww7NzaXRvCk1vbmdvREIgZXMgdW5hIGJhc2UgZGUgZGF0b3Mgb3JpZW50YWRhIGEgZG9jdW1lbnRvcyBkaXNlw7FhZGEgcGFyYSBhcGxpY2FjaW9uZXMgbW9kZXJuYXMuIFBlcm1pdGUgYWxtYWNlbmFyIGRvY3VtZW50b3MgSlNPTiBlbnJpcXVlY2lkb3MgcXVlIHNlIG1hcGVhbiBkZSBmb3JtYSBuYXR1cmFsIGEgb2JqZXRvcyBkZSBjw7NkaWdvLCBwcm9wb3JjaW9uYW5kbyBjYXBhY2lkYWRlcyBhdmFuemFkYXMgY29tbyBjb25zaXN0ZW5jaWEgQUNJRCwgdHJhbnNhY2Npb25lcywgaW5kZXhhY2nDs24gZ2VvZXNwYWNpYWwgeSBiw7pzcXVlZGFzIHZlY3RvcmlhbGVzIGEgdHJhdsOpcyBkZSBjb250cm9sYWRvcmVzIG9maWNpYWxlcyBjb21vIFB5TW9uZ28uCgpgYGBtZXJtYWlkCmdyYXBoIExSCiAgICBJbnB1dFsiRW50cmFkYSAvIENvbmZpZ3VyYWNpw7NuIl0gLS0+IExvZ2ljWyJMw7NnaWNhIGRlIG1vbmdvZGItcHltb25nby1pbnRlZ3JhdGlvbiJdCiAgICBMb2dpYyAtLT4gT3V0cHV0WyJSZXN1bHRhZG8gVmFsaWRhZG8iXQpgYGAKCi0tLQoKIyMg8J+boO+4jyBSZXF1aXNpdG9zIGRlIEluc3RhbGFjacOzbgpgYGBiYXNoCnBpcCBpbnN0YWxsIHB5bW9uZ28+PTQuNi4wCmBgYAoKLS0tCgojIyDwn5qAIENhc29zIGRlIFVzbyB5IFNjcmlwdHMgTWluaW1hbGlzdGFzCgojIyMgQ2FzbyAxOiBRdWlja3N0YXJ0IC8gSW1wbGVtZW50YWNpw7NuIGVsZW1lbnRhbCBiw6FzaWNhCiogKipFc2NlbmFyaW86KiogQ29uZXhpw7NuIGLDoXNpY2EgYSB1bmEgaW5zdGFuY2lhIGRlIE1vbmdvREIsIGluc2VyY2nDs24gZGUgdW4gZG9jdW1lbnRvIEpTT04gZXN0cnVjdHVyYWRvIHkgcmVhbGl6YWNpw7NuIGRlIHVuYSBjb25zdWx0YSBzaW1wbGUgcG9yIGNhbXBvcyBhbmlkYWRvcy4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgpmcm9tIHB5bW9uZ28gaW1wb3J0IE1vbmdvQ2xpZW50CgojIENvbmV4acOzbiBhbCBzZXJ2aWRvciBsb2NhbCBkZSBNb25nb0RCCmNsaWVudCA9IE1vbmdvQ2xpZW50KCJtb25nb2RiOi8vbG9jYWxob3N0OjI3MDE3LyIpCmRiID0gY2xpZW50WyJlbXByZXNhX2RiIl0KY29sbGVjdGlvbiA9IGRiWyJwZW9wbGUiXQoKIyBJbnNlcmNpw7NuIGRlIGRvY3VtZW50byBiYXNhZG8gZW4gbGEgZG9jdW1lbnRhY2nDs24KZG9jID0gewogICAgIm5hbWUiOiAiR3JhY2UgSG9wcGVyIiwKICAgICJvY2N1cGF0aW9ucyI6IFsiQ29tcHV0ZXIgU2NpZW50aXN0IiwgIk1hdGhlbWF0aWNpYW4iLCAiUHJvZmVzc29yIl0sCiAgICAibG9jYXRpb24iOiB7ImNpdHkiOiAiQXJsaW5ndG9uIiwgInN0YXRlIjogIlZpcmdpbmlhIiwgInppcCI6ICIyMjIwMiJ9Cn0KCmluc2VydGVkX2lkID0gY29sbGVjdGlvbi5pbnNlcnRfb25lKGRvYykuaW5zZXJ0ZWRfaWQKcHJpbnQoZiJEb2N1bWVudG8gaW5zZXJ0YWRvIGNvbiBJRDoge2luc2VydGVkX2lkfSIpCgojIENvbnN1bHRhIHV0aWxpemFuZG8gbm90YWNpw7NuIGRlIHB1bnRvcyBwYXJhIGNhbXBvcyBhbmlkYWRvcwpyZXN1bHQgPSBjb2xsZWN0aW9uLmZpbmRfb25lKHsibG9jYXRpb24uY2l0eSI6ICJBcmxpbmd0b24ifSkKcHJpbnQoIlJlc3VsdGFkbyBkZSBsYSBjb25zdWx0YToiLCByZXN1bHQpCmBgYAoKLS0tCgojIyMgQ2FzbyAyOiBNYW5lam8gZGUgRXJyb3JlcyB5IE9wZXJhY2lvbmVzIHBvciBMb3RlcyAoQnVsayBPcGVyYXRpb25zKQoqICoqRXNjZW5hcmlvOioqIEluc2VyY2nDs24gbWFzaXZhIHNlZ3VyYSBtYW5lamFuZG8gZXhjZXBjaW9uZXMgZGUgY29uZXhpw7NuIHkgZXJyb3JlcyBkZSBkdXBsaWNpZGFkIGRlIGNsYXZlcyBtZWRpYW50ZSBvcGVyYWNpb25lcyB0b2xlcmFudGVzIGEgZmFsbG9zLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmZyb20gcHltb25nbyBpbXBvcnQgTW9uZ29DbGllbnQKZnJvbSBweW1vbmdvLmVycm9ycyBpbXBvcnQgQ29ubmVjdGlvbkZhaWx1cmUsIEJ1bGtXcml0ZUVycm9yCgp0cnk6CiAgICBjbGllbnQgPSBNb25nb0NsaWVudCgibW9uZ29kYjovL2xvY2FsaG9zdDoyNzAxNy8iLCBzZXJ2ZXJTZWxlY3Rpb25UaW1lb3V0TVM9NTAwMCkKICAgIGNsaWVudC5hZG1pbi5jb21tYW5kKCdwaW5nJykKICAgIGRiID0gY2xpZW50WyJlbXByZXNhX2RiIl0KICAgIGNvbGxlY3Rpb24gPSBkYlsicGVvcGxlIl0KICAgIAogICAgZG9jcyA9IFsKICAgICAgICB7Il9pZCI6IDEsICJuYW1lIjogIkFsYW4gVHVyaW5nIiwgImxvY2F0aW9uIjogeyJjaXR5IjogIkxvbmRvbiJ9fSwKICAgICAgICB7Il9pZCI6IDIsICJuYW1lIjogIkFkYSBMb3ZlbGFjZSIsICJsb2NhdGlvbiI6IHsiY2l0eSI6ICJMb25kb24ifX0sCiAgICAgICAgeyJfaWQiOiAxLCAibmFtZSI6ICJEdXBsaWNhZG8iLCAibG9jYXRpb24iOiB7ImNpdHkiOiAiUGFyaXMifX0gIyBQcm92b2NhIGVycm9yIGRlIGNsYXZlIGR1cGxpY2FkYQogICAgXQogICAgCiAgICB0cnk6CiAgICAgICAgcmVzdWx0ID0gY29sbGVjdGlvbi5pbnNlcnRfbWFueShkb2NzLCBvcmRlcmVkPUZhbHNlKQogICAgICAgIHByaW50KGYiSW5zZXJ0YWRvcyBleGl0b3NhbWVudGU6IHtsZW4ocmVzdWx0Lmluc2VydGVkX2lkcyl9IikKICAgIGV4Y2VwdCBCdWxrV3JpdGVFcnJvciBhcyBid2U6CiAgICAgICAgcHJpbnQoZiJPY3Vycmllcm9uIGVycm9yZXMgZW4gbGEgaW5zZXJjacOzbiBwb3IgbG90ZXM6IHtid2UuZGV0YWlsc30iKQogICAgICAgIApleGNlcHQgQ29ubmVjdGlvbkZhaWx1cmU6CiAgICBwcmludCgiTm8gc2UgcHVkbyBlc3RhYmxlY2VyIGNvbmV4acOzbiBjb24gZWwgc2Vydmlkb3IgTW9uZ29EQi4iKQpmaW5hbGx5OgogICAgY2xpZW50LmNsb3NlKCkKYGBgCgotLS0KCiMjIyBDYXNvIDM6IFBhdHLDs24gZGUgUHJvZHVjY2nDs246IFRyYW5zYWNjaW9uZXMgQUNJRCB5IFJlc2lsaWVuY2lhCiogKipFc2NlbmFyaW86KiogSW1wbGVtZW50YWNpw7NuIGRlIHRyYW5zYWNjaW9uZXMgQUNJRCBtdWx0aS1kb2N1bWVudG8gY29uIHJlaW50ZW50b3MgYXV0b23DoXRpY29zIHBhcmEgZ2FyYW50aXphciBjb25zaXN0ZW5jaWEgZXN0cmljdGEgZW4gZW50b3Jub3MgZGlzdHJpYnVpZG9zLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmZyb20gcHltb25nbyBpbXBvcnQgTW9uZ29DbGllbnQKZnJvbSBweW1vbmdvLmVycm9ycyBpbXBvcnQgT3BlcmF0aW9uRmFpbHVyZQoKY2xpZW50ID0gTW9uZ29DbGllbnQoIm1vbmdvZGI6Ly9sb2NhbGhvc3Q6MjcwMTcvIikKZGIgPSBjbGllbnRbImVtcHJlc2FfZGIiXQoKZGVmIHRyYW5zZmVyX29jY3VwYXRpb24oc2Vzc2lvbiwgcGVyc29uX25hbWUsIG5ld19vY2N1cGF0aW9uKToKICAgIGNvbGxlY3Rpb24gPSBkYlsicGVvcGxlIl0KICAgIAogICAgIyBPcGVyYWNpw7NuIHRyYW5zYWNjaW9uYWwKICAgIGNvbGxlY3Rpb24udXBkYXRlX29uZSgKICAgICAgICB7Im5hbWUiOiBwZXJzb25fbmFtZX0sCiAgICAgICAgeyIkcHVzaCI6IHsib2NjdXBhdGlvbnMiOiBuZXdfb2NjdXBhdGlvbn19LAogICAgICAgIHNlc3Npb249c2Vzc2lvbgogICAgKQoKIyBFamVjdWNpw7NuIGNvbiBwYXRyw7NuIGRlIHJlaW50ZW50byBwYXJhIHRyYW5zYWNjaW9uZXMgQUNJRAp3aXRoIGNsaWVudC5zdGFydF9zZXNzaW9uKCkgYXMgc2Vzc2lvbjoKICAgIHRyeToKICAgICAgICB3aXRoIHNlc3Npb24uc3RhcnRfdHJhbnNhY3Rpb24oKToKICAgICAgICAgICAgdHJhbnNmZXJfb2NjdXBhdGlvbihzZXNzaW9uLCAiR3JhY2UgSG9wcGVyIiwgIlN5c3RlbXMgRW5naW5lZXIiKQogICAgICAgICAgICBwcmludCgiVHJhbnNhY2Npw7NuIEFDSUQgY29tcGxldGFkYSBleGl0b3NhbWVudGUuIikKICAgIGV4Y2VwdCBPcGVyYXRpb25GYWlsdXJlIGFzIGV4YzoKICAgICAgICBwcmludChmIlRyYW5zYWNjacOzbiBhYm9ydGFkYSBkZWJpZG8gYSB1biBmYWxsbzoge2V4Y30iKQpmaW5hbGx5OgogICAgY2xpZW50LmNsb3NlKCkKYGBgCgotLS0KCgojIyDimqDvuI8gQ29uc2lkZXJhY2lvbmVzIFTDqWNuaWNhcyB5IEdvdGNoYXMKKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIFV0aWxpemEgb3BlcmFjaW9uZXMgcG9yIGxvdGVzIChpbnNlcnRfbWFueSBjb24gb3JkZXJlZD1GYWxzZSkgcGFyYSBvcHRpbWl6YXIgbGEgaW5nZXN0YSBtYXNpdmEgZGUgZGF0b3MuCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBJbXBsZW1lbnRhIHNpZW1wcmUgYmxvcXVlcyBkZSBnZXN0acOzbiBkZSBzZXNpb25lcyB5IHRyYW5zYWNjaW9uZXMgQUNJRCBjdWFuZG8gbGEgY29uc2lzdGVuY2lhIGRlIG3Dumx0aXBsZXMgZG9jdW1lbnRvcyBzZWEgY3LDrXRpY2EuCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBDb25maWd1cmEgdGllbXBvcyBkZSBlc3BlcmEgZXhwbMOtY2l0b3MgKHNlcnZlclNlbGVjdGlvblRpbWVvdXRNUykgcGFyYSBldml0YXIgYmxvcXVlb3MgcHJvbG9uZ2Fkb3MgYW50ZSBjYcOtZGFzIGRlIHJlZC4KKiAqKkdvdGNoYS9BbGVydGE6KiogT2x2aWRhciBjZXJyYXIgZWwgY2xpZW50ZSBkZSBNb25nb0RCIG8gbm8gdXRpbGl6YXJsbyBjb21vIGNvbnRleHRvLCBwcm92b2NhbmRvIGZ1Z2FzIGRlIGNvbmV4aW9uZXMuCiogKipHb3RjaGEvQWxlcnRhOioqIEludGVudGFyIHJlYWxpemFyIHRyYW5zYWNjaW9uZXMgQUNJRCBlbiBhcnF1aXRlY3R1cmFzIGRlIG5vZG9zIGluZGVwZW5kaWVudGVzIChTdGFuZGFsb25lKSBxdWUgbm8gc29wb3J0YW4gY29uanVudG9zIGRlIHLDqXBsaWNhcyAoUmVwbGljYSBTZXRzKS4KKiAqKkdvdGNoYS9BbGVydGE6KiogTm8gaW5kZXhhciBjYW1wb3MgY29uc3VsdGFkb3MgZnJlY3VlbnRlbWVudGUgY29uIG5vdGFjacOzbiBkZSBwdW50b3MgKGVqLiBsb2NhdGlvbi5jaXR5KSwgZGVncmFkYW5kbyBlbCByZW5kaW1pZW50byBkZSBsZWN0dXJhLgoKLS0tCgojIyDwn5SXIE5vZG9zIFJlbGFjaW9uYWRvcyBlbiBlbCBHcmFmbwoqIFtbMDFfU2tpbGxzL1NLSUxMXzAwMV9TY3JhcGluZ195X0V4dHJhY2Npb25fV2VifEhhYmlsaWRhZCBUw6ljbmljYTogU2NyYXBpbmcgeSBFeHRyYWNjacOzbiBXZWJdXQoqIFtbMDNfUHJveWVjdG9zL1BST0pfMDAxX0FnZW50ZV9TY3JhcGVyfFByb3llY3RvOiBBZ2VudGUgU2NyYXBlcl1dCg==" download="CU_042_mongodb-pymongo-integration.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Técnico de la Documentación</h2>
+            <p>MongoDB es una base de datos orientada a documentos diseñada para aplicaciones modernas. Permite almacenar documentos JSON enriquecidos que se mapean de forma natural a objetos de código, proporcionando capacidades avanzadas como consistencia ACID, transacciones, indexación geoespacial y búsquedas vectoriales a través de controladores oficiales como PyMongo.</p>
+            <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #94a3b8;">
+                🔗 <strong>Fuente:</strong> <a href="https://www.mongodb.com/es/docs/" target="_blank" style="color: #818cf8; text-decoration: underline;">https://www.mongodb.com/es/docs/</a>
+            </div>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Quickstart / Implementación elemental básica</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Conexión básica a una instancia de MongoDB, inserción de un documento JSON estructurado y realización de una consulta simple por campos anidados.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from pymongo import MongoClient
+
+# Conexión al servidor local de MongoDB
+client = MongoClient("mongodb://localhost:27017/")
+db = client["empresa_db"]
+collection = db["people"]
+
+# Inserción de documento basado en la documentación
+doc = {
+    "name": "Grace Hopper",
+    "occupations": ["Computer Scientist", "Mathematician", "Professor"],
+    "location": {"city": "Arlington", "state": "Virginia", "zip": "22202"}
+}
+
+inserted_id = collection.insert_one(doc).inserted_id
+print(f"Documento insertado con ID: {inserted_id}")
+
+# Consulta utilizando notación de puntos para campos anidados
+result = collection.find_one({"location.city": "Arlington"})
+print("Resultado de la consulta:", result)</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Manejo de Errores y Operaciones por Lotes (Bulk Operations)</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Inserción masiva segura manejando excepciones de conexión y errores de duplicidad de claves mediante operaciones tolerantes a fallos.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure, BulkWriteError
+
+try:
+    client = MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=5000)
+    client.admin.command('ping')
+    db = client["empresa_db"]
+    collection = db["people"]
+    
+    docs = [
+        {"_id": 1, "name": "Alan Turing", "location": {"city": "London"}},
+        {"_id": 2, "name": "Ada Lovelace", "location": {"city": "London"}},
+        {"_id": 1, "name": "Duplicado", "location": {"city": "Paris"}} # Provoca error de clave duplicada
+    ]
+    
+    try:
+        result = collection.insert_many(docs, ordered=False)
+        print(f"Insertados exitosamente: {len(result.inserted_ids)}")
+    except BulkWriteError as bwe:
+        print(f"Ocurrieron errores en la inserción por lotes: {bwe.details}")
+        
+except ConnectionFailure:
+    print("No se pudo establecer conexión con el servidor MongoDB.")
+finally:
+    client.close()</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Producción: Transacciones ACID y Resiliencia</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Implementación de transacciones ACID multi-documento con reintentos automáticos para garantizar consistencia estricta en entornos distribuidos.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">from pymongo import MongoClient
+from pymongo.errors import OperationFailure
+
+client = MongoClient("mongodb://localhost:27017/")
+db = client["empresa_db"]
+
+def transfer_occupation(session, person_name, new_occupation):
+    collection = db["people"]
+    
+    # Operación transaccional
+    collection.update_one(
+        {"name": person_name},
+        {"$push": {"occupations": new_occupation}},
+        session=session
+    )
+
+# Ejecución con patrón de reintento para transacciones ACID
+with client.start_session() as session:
+    try:
+        with session.start_transaction():
+            transfer_occupation(session, "Grace Hopper", "Systems Engineer")
+            print("Transacción ACID completada exitosamente.")
+    except OperationFailure as exc:
+        print(f"Transacción abortada debido a un fallo: {exc}")
+finally:
+    client.close()</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utiliza operaciones por lotes (insert_many con ordered=False) para optimizar la ingesta masiva de datos.</li><li>✅ <strong>Práctica:</strong> Implementa siempre bloques de gestión de sesiones y transacciones ACID cuando la consistencia de múltiples documentos sea crítica.</li><li>✅ <strong>Práctica:</strong> Configura tiempos de espera explícitos (serverSelectionTimeoutMS) para evitar bloqueos prolongados ante caídas de red.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> Olvidar cerrar el cliente de MongoDB o no utilizarlo como contexto, provocando fugas de conexiones.</li><li>⚠️ <strong>Alerta:</strong> Intentar realizar transacciones ACID en arquitecturas de nodos independientes (Standalone) que no soportan conjuntos de réplicas (Replica Sets).</li><li>⚠️ <strong>Alerta:</strong> No indexar campos consultados frecuentemente con notación de puntos (ej. location.city), degradando el rendimiento de lectura.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

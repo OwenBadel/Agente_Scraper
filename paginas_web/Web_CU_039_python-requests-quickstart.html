@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumo de APIs y Peticiones HTTP con Python Requests — Fábrica de Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-code: #090d16;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #818cf8;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .case-badge {
+            background: #6366f1;
+            color: white;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .case-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .case-scenario {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .code-container {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .considerations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .consideration-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .consideration-box h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .consideration-box ul {
+            list-style: none;
+        }
+
+        .consideration-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="index.html">← Volver al Catálogo General de Páginas Web</a>
+        </div>
+        <header>
+            <h1 class="title">Consumo de APIs y Peticiones HTTP con Python Requests</h1>
+            <p>Documentación técnica analizada por PROJ_001_Agente_Scraper</p>
+            
+            <div class="meta-bar">
+                <span class="badge">basic</span>
+                <span>🌐 <strong>Documentación Oficial:</strong> <a href="https://docs.python-requests.org/en/latest/user/quickstart/" target="_blank" style="color: #79f2f0; text-decoration: underline; font-family: monospace;">https://docs.python-requests.org/en/latest/user/quickstart/ ↗</a></span>
+                <span>📦 Dependencias: <code>requests>=2.31.0</code></span>
+                <div class="tags-container"><span class="tag">#python</span><span class="tag">#requests</span><span class="tag">#http</span><span class="tag">#api</span></div>
+            </div>
+
+            <div class="cta-bar">
+                <span>Estándar de Conocimiento: <strong>OKF v1.0.0 (Obsidian)</strong></span>
+                <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
+                <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,LS0tCmlkOiBDVS0wMzktUFlUSE9OLVJFUVVFU1RTLVFVSUNLU1RBUlQKdGl0bGU6IENvbnN1bW8gZGUgQVBJcyB5IFBldGljaW9uZXMgSFRUUCBjb24gUHl0aG9uIFJlcXVlc3RzCnR5cGU6IHVzZS1jYXNlCnZlcnNpb246IDEuMC4wCnN0YXR1czogYWN0aXZlCmNyZWF0ZWRfYXQ6ICcyMDI2LTA5LTA1VDA4OjU5OjAwLjExNjI5OS0wNTowMCcKdXBkYXRlZF9hdDogJzIwMjYtMDktMDVUMDg6NTk6MDAuMTE2Mjk5LTA1OjAwJwpzb3VyY2VfdXJsOiBodHRwczovL2RvY3MucHl0aG9uLXJlcXVlc3RzLm9yZy9lbi9sYXRlc3QvdXNlci9xdWlja3N0YXJ0Lwp0YWdzOgotIHB5dGhvbgotIHJlcXVlc3RzCi0gaHR0cAotIGFwaQotIGNhc28tZGUtdXNvCnNraWxsc19yZXF1aXJlZDoKLSAwMV9Ta2lsbHMvU0tJTEwtMDAxLVNDUkFQSU5HLUVYVFJBQ0NJT04tV0VCCmRlcGVuZGVuY2llczoKLSByZXF1ZXN0cz49Mi4zMS4wCmNvbXBsZXhpdHk6IGJhc2ljCnNlbWFudGljX3N1bW1hcnk6IExhIGxpYnJlcsOtYSBSZXF1ZXN0cyBlcyBlbCBlc3TDoW5kYXIgZGUgZmFjdG8gZW4gZWwgZWNvc2lzdGVtYSBkZQogIFB5dGhvbiBwYXJhIHJlYWxpemFyIHBldGljaW9uZXMgSFRUUCBkZSBmb3JtYSBzZW5jaWxsYSwgaW50dWl0aXZhIHkgcm9idXN0YS4gUGVybWl0ZQogIGludGVyYWN0dWFyIGNvbiBzZXJ2aWNpb3Mgd2ViIG1lZGlhbnRlIG3DqXRvZG9zIEhUVFAgZXN0w6FuZGFyLCBtYW5lamFyIHBhcsOhbWV0cm9zCiAgZGUgY29uc3VsdGEsIGdlc3Rpb25hciBjYWJlY2VyYXMgcGVyc29uYWxpemFkYXMgeSBwcm9jZXNhciByZXNwdWVzdGFzIGVuIGZvcm1hdG9zCiAgY29tbyBKU09OIG8gY29udGVuaWRvIGJpbmFyaW8uCi0tLQoKIyDwn5KhIENvbnN1bW8gZGUgQVBJcyB5IFBldGljaW9uZXMgSFRUUCBjb24gUHl0aG9uIFJlcXVlc3RzCgo+ICoqT3JpZ2VuOioqIFtodHRwczovL2RvY3MucHl0aG9uLXJlcXVlc3RzLm9yZy9lbi9sYXRlc3QvdXNlci9xdWlja3N0YXJ0L10oaHR0cHM6Ly9kb2NzLnB5dGhvbi1yZXF1ZXN0cy5vcmcvZW4vbGF0ZXN0L3VzZXIvcXVpY2tzdGFydC8pICAKPiAqKkNvbXBsZWppZGFkOioqIGBiYXNpY2AgfCAqKkVzdMOhbmRhcjoqKiBgT0tGIHYxLjAuMGAKCi0tLQoKIyMg8J+TjCBSZXN1bWVuIENvbmNlcHR1YWwgeSBQcm9ww7NzaXRvCkxhIGxpYnJlcsOtYSBSZXF1ZXN0cyBlcyBlbCBlc3TDoW5kYXIgZGUgZmFjdG8gZW4gZWwgZWNvc2lzdGVtYSBkZSBQeXRob24gcGFyYSByZWFsaXphciBwZXRpY2lvbmVzIEhUVFAgZGUgZm9ybWEgc2VuY2lsbGEsIGludHVpdGl2YSB5IHJvYnVzdGEuIFBlcm1pdGUgaW50ZXJhY3R1YXIgY29uIHNlcnZpY2lvcyB3ZWIgbWVkaWFudGUgbcOpdG9kb3MgSFRUUCBlc3TDoW5kYXIsIG1hbmVqYXIgcGFyw6FtZXRyb3MgZGUgY29uc3VsdGEsIGdlc3Rpb25hciBjYWJlY2VyYXMgcGVyc29uYWxpemFkYXMgeSBwcm9jZXNhciByZXNwdWVzdGFzIGVuIGZvcm1hdG9zIGNvbW8gSlNPTiBvIGNvbnRlbmlkbyBiaW5hcmlvLgoKYGBgbWVybWFpZApncmFwaCBMUgogICAgSW5wdXRbIkVudHJhZGEgLyBDb25maWd1cmFjacOzbiJdIC0tPiBMb2dpY1siTMOzZ2ljYSBkZSBweXRob24tcmVxdWVzdHMtcXVpY2tzdGFydCJdCiAgICBMb2dpYyAtLT4gT3V0cHV0WyJSZXN1bHRhZG8gVmFsaWRhZG8iXQpgYGAKCi0tLQoKIyMg8J+boO+4jyBSZXF1aXNpdG9zIGRlIEluc3RhbGFjacOzbgpgYGBiYXNoCnBpcCBpbnN0YWxsIHJlcXVlc3RzPj0yLjMxLjAKYGBgCgotLS0KCiMjIPCfmoAgQ2Fzb3MgZGUgVXNvIHkgU2NyaXB0cyBNaW5pbWFsaXN0YXMKCiMjIyBDYXNvIDE6IFF1aWNrc3RhcnQgLyBJbXBsZW1lbnRhY2nDs24gZWxlbWVudGFsIGLDoXNpY2EKKiAqKkVzY2VuYXJpbzoqKiBSZWFsaXphciB1bmEgcGV0aWNpw7NuIEdFVCBzaW1wbGUgYSB1bmEgQVBJIHDDumJsaWNhIHkgcHJvY2VzYXIgbGEgcmVzcHVlc3RhIGVuIGZvcm1hdG8gSlNPTi4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgcmVxdWVzdHMKCmRlZiBmZXRjaF9naXRodWJfZXZlbnRzKCkgLT4gTm9uZToKICAgIHVybCA9ICJodHRwczovL2FwaS5naXRodWIuY29tL2V2ZW50cyIKICAgIHJlc3BvbnNlID0gcmVxdWVzdHMuZ2V0KHVybCkKICAgIAogICAgcHJpbnQoZiJTdGF0dXMgQ29kZToge3Jlc3BvbnNlLnN0YXR1c19jb2RlfSIpCiAgICBwcmludChmIkVuY29kaW5nOiB7cmVzcG9uc2UuZW5jb2Rpbmd9IikKICAgIAogICAgZGF0YSA9IHJlc3BvbnNlLmpzb24oKQogICAgcHJpbnQoZiJUb3RhbCBldmVudHMgcmV0cmlldmVkOiB7bGVuKGRhdGEpfSIpCgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgZmV0Y2hfZ2l0aHViX2V2ZW50cygpCmBgYAoKLS0tCgojIyMgQ2FzbyAyOiBNYW5lam8gZGUgRXJyb3JlcyB5IEVudsOtbyBkZSBQYXLDoW1ldHJvcyBlbiBVUkwKKiAqKkVzY2VuYXJpbzoqKiBDb25zdHJ1aXIgdW5hIGNvbnN1bHRhIEhUVFAgY29uIHBhcsOhbWV0cm9zIGRpbsOhbWljb3MgdXRpbGl6YW5kbyBkaWNjaW9uYXJpb3MgeSB2YWxpZGFyIGPDs2RpZ29zIGRlIGVycm9yIG1lZGlhbnRlIGV4Y2VwY2lvbmVzLgoqICoqQ8OzZGlnbyBNaW5pbWFsaXN0YToqKgoKYGBgcHl0aG9uCmltcG9ydCByZXF1ZXN0cwoKZGVmIHNlYXJjaF9odHRwYmluKCkgLT4gTm9uZToKICAgIHVybCA9ICJodHRwczovL2h0dHBiaW4ub3JnL2dldCIKICAgIHBheWxvYWQgPSB7ImtleTEiOiAidmFsdWUxIiwgImtleTIiOiBbInZhbHVlMiIsICJ2YWx1ZTMiXX0KICAgIAogICAgdHJ5OgogICAgICAgIHJlc3BvbnNlID0gcmVxdWVzdHMuZ2V0KHVybCwgcGFyYW1zPXBheWxvYWQsIHRpbWVvdXQ9NSkKICAgICAgICByZXNwb25zZS5yYWlzZV9mb3Jfc3RhdHVzKCkKICAgICAgICAKICAgICAgICBwcmludChmIkdlbmVyYXRlZCBVUkw6IHtyZXNwb25zZS51cmx9IikKICAgICAgICBqc29uX2RhdGEgPSByZXNwb25zZS5qc29uKCkKICAgICAgICBwcmludChmIkFyZ3MgcmVjZWl2ZWQ6IHtqc29uX2RhdGEuZ2V0KCdhcmdzJyl9IikKICAgICAgICAKICAgIGV4Y2VwdCByZXF1ZXN0cy5leGNlcHRpb25zLkhUVFBFcnJvciBhcyBlcnI6CiAgICAgICAgcHJpbnQoZiJIVFRQIGVycm9yIG9jY3VycmVkOiB7ZXJyfSIpCiAgICBleGNlcHQgcmVxdWVzdHMuZXhjZXB0aW9ucy5UaW1lb3V0OgogICAgICAgIHByaW50KCJUaGUgcmVxdWVzdCB0aW1lZCBvdXQiKQogICAgZXhjZXB0IHJlcXVlc3RzLmV4Y2VwdGlvbnMuUmVxdWVzdEV4Y2VwdGlvbiBhcyBlcnI6CiAgICAgICAgcHJpbnQoZiJBbiBlcnJvciBvY2N1cnJlZDoge2Vycn0iKQoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIHNlYXJjaF9odHRwYmluKCkKYGBgCgotLS0KCiMjIyBDYXNvIDM6IFBhdHLDs24gZGUgUHJvZHVjY2nDs246IEVudsOtbyBkZSBKU09OIHkgU3RyZWFtaW5nIGRlIEFyY2hpdm9zCiogKipFc2NlbmFyaW86KiogRW52aWFyIGRhdG9zIGVzdHJ1Y3R1cmFkb3MgZW4gZm9ybWF0byBKU09OIGNvbiBjYWJlY2VyYXMgcGVyc29uYWxpemFkYXMgeSBkZXNjYXJnYXIgYXJjaGl2b3MgZ3JhbmRlcyBtZWRpYW50ZSBzdHJlYW1pbmcgZGUgYmxvcXVlcy4KKiAqKkPDs2RpZ28gTWluaW1hbGlzdGE6KioKCmBgYHB5dGhvbgppbXBvcnQgcmVxdWVzdHMKCmRlZiBwcm9kdWN0aW9uX3BhdHRlcm5fZXhhbXBsZSgpIC0+IE5vbmU6CiAgICBlbmRwb2ludCA9ICJodHRwczovL2h0dHBiaW4ub3JnL3Bvc3QiCiAgICBoZWFkZXJzID0geyJ1c2VyLWFnZW50IjogIm15LXByb2R1Y3Rpb24tYXBwLzEuMC4wIn0KICAgIHBheWxvYWQgPSB7InN0YXR1cyI6ICJhY3RpdmUiLCAiaXRlbXMiOiBbMSwgMiwgM119CiAgICAKICAgICMgRW52w61vIGRlIFBPU1QgY29uIEpTT04gYXV0b23DoXRpY28KICAgIHJlc3BvbnNlID0gcmVxdWVzdHMucG9zdChlbmRwb2ludCwganNvbj1wYXlsb2FkLCBoZWFkZXJzPWhlYWRlcnMpCiAgICBwcmludChmIlBPU1QgU3RhdHVzOiB7cmVzcG9uc2Uuc3RhdHVzX2NvZGV9IikKICAgIAogICAgIyBEZXNjYXJnYSBzaW11bGFkYSBwb3Igc3RyZWFtaW5nCiAgICBzdHJlYW1fdXJsID0gImh0dHBzOi8vaHR0cGJpbi5vcmcvYnl0ZXMvMTAyNCIKICAgIHdpdGggcmVxdWVzdHMuZ2V0KHN0cmVhbV91cmwsIHN0cmVhbT1UcnVlKSBhcyByOgogICAgICAgIHIucmFpc2VfZm9yX3N0YXR1cygpCiAgICAgICAgdG90YWxfYnl0ZXMgPSAwCiAgICAgICAgZm9yIGNodW5rIGluIHIuaXRlcl9jb250ZW50KGNodW5rX3NpemU9MTI4KToKICAgICAgICAgICAgdG90YWxfYnl0ZXMgKz0gbGVuKGNodW5rKQogICAgICAgIHByaW50KGYiRG93bmxvYWRlZCB0b3RhbCBieXRlcyB2aWEgc3RyZWFtOiB7dG90YWxfYnl0ZXN9IikKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBwcm9kdWN0aW9uX3BhdHRlcm5fZXhhbXBsZSgpCmBgYAoKLS0tCgoKIyMg4pqg77iPIENvbnNpZGVyYWNpb25lcyBUw6ljbmljYXMgeSBHb3RjaGFzCiogKipCdWVuYXMgUHLDoWN0aWNhczoqKiBVdGlsaXphciBzaWVtcHJlIHJlc3BvbnNlLnJhaXNlX2Zvcl9zdGF0dXMoKSBkZXNwdcOpcyBkZSB1bmEgcGV0aWNpw7NuIHBhcmEgZGV0ZWN0YXIgY8OzZGlnb3MgZGUgZXJyb3IgSFRUUCBkZSBmb3JtYSB0ZW1wcmFuYS4KKiAqKkJ1ZW5hcyBQcsOhY3RpY2FzOioqIEVtcGxlYXIgZWwgcGFyw6FtZXRybyAnanNvbicgZW4gbHVnYXIgZGUgc2VyaWFsaXphciBtYW51YWxtZW50ZSBjb24ganNvbi5kdW1wcygpIHBhcmEgYXNlZ3VyYXIgcXVlIGxhIGNhYmVjZXJhIENvbnRlbnQtVHlwZSBzZSBjb25maWd1cmUgY29ycmVjdGFtZW50ZS4KKiAqKkdvdGNoYS9BbGVydGE6KiogQ29uZmlhciBlbiByLmpzb24oKSBzaW4gdmFsaWRhciBwcmltZXJvIGVsIGVzdGFkbyBkZSBsYSByZXNwdWVzdGEgbyBtYW5lamFyIGxhIGV4Y2VwY2nDs24gSlNPTkRlY29kZUVycm9yLgoqICoqR290Y2hhL0FsZXJ0YToqKiBPbHZpZGFyIGNvbmZpZ3VyYXIgdW4gdGllbXBvIGRlIGVzcGVyYSAodGltZW91dCkgZW4gbGFzIHBldGljaW9uZXMsIGxvIHF1ZSBwdWVkZSBjYXVzYXIgYmxvcXVlb3MgaW5kZWZpbmlkb3MgZW4gbGEgYXBsaWNhY2nDs24uCgotLS0KCiMjIPCflJcgTm9kb3MgUmVsYWNpb25hZG9zIGVuIGVsIEdyYWZvCiogW1swMV9Ta2lsbHMvU0tJTExfMDAxX1NjcmFwaW5nX3lfRXh0cmFjY2lvbl9XZWJ8SGFiaWxpZGFkIFTDqWNuaWNhOiBTY3JhcGluZyB5IEV4dHJhY2Npw7NuIFdlYl1dCiogW1swM19Qcm95ZWN0b3MvUFJPSl8wMDFfQWdlbnRlX1NjcmFwZXJ8UHJveWVjdG86IEFnZW50ZSBTY3JhcGVyXV0K" download="CU_039_python-requests-quickstart.md">
+                    📥 Descargar Nota .md para Obsidian
+                </a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <h2 class="summary-title">📌 Resumen Técnico de la Documentación</h2>
+            <p>La librería Requests es el estándar de facto en el ecosistema de Python para realizar peticiones HTTP de forma sencilla, intuitiva y robusta. Permite interactuar con servicios web mediante métodos HTTP estándar, manejar parámetros de consulta, gestionar cabeceras personalizadas y procesar respuestas en formatos como JSON o contenido binario.</p>
+            <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #94a3b8;">
+                🔗 <strong>Fuente:</strong> <a href="https://docs.python-requests.org/en/latest/user/quickstart/" target="_blank" style="color: #818cf8; text-decoration: underline;">https://docs.python-requests.org/en/latest/user/quickstart/</a>
+            </div>
+        </section>
+
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.6rem; color: #f8fafc;">🚀 3 Casos de Uso Prácticos y Scripts Minimalistas</h2>
+        
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 1</span>
+                    <h3 class="case-title">Quickstart / Implementación elemental básica</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Realizar una petición GET simple a una API pública y procesar la respuesta en formato JSON.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import requests
+
+def fetch_github_events() -&gt; None:
+    url = "https://api.github.com/events"
+    response = requests.get(url)
+    
+    print(f"Status Code: {response.status_code}")
+    print(f"Encoding: {response.encoding}")
+    
+    data = response.json()
+    print(f"Total events retrieved: {len(data)}")
+
+if __name__ == "__main__":
+    fetch_github_events()</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 2</span>
+                    <h3 class="case-title">Manejo de Errores y Envío de Parámetros en URL</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Construir una consulta HTTP con parámetros dinámicos utilizando diccionarios y validar códigos de error mediante excepciones.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import requests
+
+def search_httpbin() -&gt; None:
+    url = "https://httpbin.org/get"
+    payload = {"key1": "value1", "key2": ["value2", "value3"]}
+    
+    try:
+        response = requests.get(url, params=payload, timeout=5)
+        response.raise_for_status()
+        
+        print(f"Generated URL: {response.url}")
+        json_data = response.json()
+        print(f"Args received: {json_data.get('args')}")
+        
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except requests.exceptions.Timeout:
+        print("The request timed out")
+    except requests.exceptions.RequestException as err:
+        print(f"An error occurred: {err}")
+
+if __name__ == "__main__":
+    search_httpbin()</code></pre>
+                </div>
+            </div>
+            
+            <div class="case-card">
+                <div class="case-header">
+                    <span class="case-badge">Caso 3</span>
+                    <h3 class="case-title">Patrón de Producción: Envío de JSON y Streaming de Archivos</h3>
+                </div>
+                <p class="case-scenario">💡 <strong>Escenario:</strong> Enviar datos estructurados en formato JSON con cabeceras personalizadas y descargar archivos grandes mediante streaming de bloques.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>Python Minimalista</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+                    </div>
+                    <pre><code class="language-python">import requests
+
+def production_pattern_example() -&gt; None:
+    endpoint = "https://httpbin.org/post"
+    headers = {"user-agent": "my-production-app/1.0.0"}
+    payload = {"status": "active", "items": [1, 2, 3]}
+    
+    # Envío de POST con JSON automático
+    response = requests.post(endpoint, json=payload, headers=headers)
+    print(f"POST Status: {response.status_code}")
+    
+    # Descarga simulada por streaming
+    stream_url = "https://httpbin.org/bytes/1024"
+    with requests.get(stream_url, stream=True) as r:
+        r.raise_for_status()
+        total_bytes = 0
+        for chunk in r.iter_content(chunk_size=128):
+            total_bytes += len(chunk)
+        print(f"Downloaded total bytes via stream: {total_bytes}")
+
+if __name__ == "__main__":
+    production_pattern_example()</code></pre>
+                </div>
+            </div>
+            
+
+        <div class="considerations">
+            <div class="consideration-box">
+                <h4 style="color: #10b981;">✅ Buenas Prácticas</h4>
+                <ul><li>✅ <strong>Práctica:</strong> Utilizar siempre response.raise_for_status() después de una petición para detectar códigos de error HTTP de forma temprana.</li><li>✅ <strong>Práctica:</strong> Emplear el parámetro 'json' en lugar de serializar manualmente con json.dumps() para asegurar que la cabecera Content-Type se configure correctamente.</li></ul>
+            </div>
+            <div class="consideration-box">
+                <h4 style="color: #f43f5e;">⚠️ Gotchas & Alertas</h4>
+                <ul><li>⚠️ <strong>Alerta:</strong> Confiar en r.json() sin validar primero el estado de la respuesta o manejar la excepción JSONDecodeError.</li><li>⚠️ <strong>Alerta:</strong> Olvidar configurar un tiempo de espera (timeout) en las peticiones, lo que puede causar bloqueos indefinidos en la aplicación.</li></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>PROJ_001_Agente_Scraper | Fábrica de Software Autónoma (OKF & Obsidian)</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerText = '✓ Copiado';
+                setTimeout(() => { button.innerText = '📋 Copiar'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
