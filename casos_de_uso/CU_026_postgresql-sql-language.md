@@ -27,7 +27,7 @@ semantic_summary: Implementación práctica de operaciones SQL en PostgreSQL uti
 # 💡 Gestión de Bases de Datos Relacionales con PostgreSQL y Python
 
 > **Origen:** [https://www.postgresql.org/docs/current/sql.html](https://www.postgresql.org/docs/current/sql.html)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

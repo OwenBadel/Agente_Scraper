@@ -27,7 +27,7 @@ semantic_summary: Guía práctica para realizar peticiones HTTP de forma elegant
 # 💡 Consumo de APIs y Peticiones HTTP con Requests
 
 > **Origen:** [https://docs.python-requests.org/en/latest/user/quickstart/](https://docs.python-requests.org/en/latest/user/quickstart/)  
-> **Complejidad:** `basic` | **Estándar:** `v1.0.0`
+> **Complejidad:** `basic` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

@@ -29,7 +29,7 @@ semantic_summary: FastAPI es un framework web de alto rendimiento diseñado para
 # 💡 Desarrollo de APIs Modernas con FastAPI
 
 > **Origen:** [https://fastapi.tiangolo.com/tutorial/first-steps/](https://fastapi.tiangolo.com/tutorial/first-steps/)  
-> **Complejidad:** `basic` | **Estándar:** `v1.0.0`
+> **Complejidad:** `basic` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

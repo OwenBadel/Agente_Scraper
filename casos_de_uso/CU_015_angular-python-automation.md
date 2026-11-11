@@ -30,7 +30,7 @@ semantic_summary: Angular es un framework de desarrollo web mantenido por Google
 # 💡 Automatización y Orquestación de Ecosistemas Angular con Python
 
 > **Origen:** [https://angular.dev/overview](https://angular.dev/overview)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

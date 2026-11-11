@@ -31,7 +31,7 @@ semantic_summary: Tailwind CSS es un framework de diseño basado en utilidades q
 # 💡 Automatización e Integración de Tailwind CSS con Python
 
 > **Origen:** [https://tailwindcss.com/docs/installation/using-vite](https://tailwindcss.com/docs/installation/using-vite)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

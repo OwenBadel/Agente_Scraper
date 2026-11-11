@@ -18,21 +18,20 @@ El **Agente Scraper** es una solución de software profesional e independiente c
 ## 📂 Estructura del Proyecto
 
 ```text
-PROJ_001_Agente_Scraper/
+Agente_Scraper/
 ├── src/                                  <-- Código Fuente Autónomo
 │   ├── extractor.py                      <-- Parsing HTML, BeautifulSoup4, Markdownify, resiliencia curl
 │   ├── llm_client.py                     <-- Cliente LLM multi-modelo (Gemini API / Fallback chain)
 │   ├── analyzer.py                       <-- Formulación de 3 Casos de Uso estructurados
-│   ├── okf_exporter.py                   <-- Exportador de Notas .md (Arquitectura Modular)
+│   ├── okf_exporter.py                   <-- Exportador de Notas .md estructuradas
 │   ├── web_exporter.py                   <-- Exportador de Páginas Web HTML + Catálogo index.html
 │   └── main.py                           <-- Orquestador CLI
-├── casos_de_uso/                         <-- Notas Markdown Modular producidas
+├── casos_de_uso/                         <-- Notas Markdown producidas
 ├── paginas_web/                          <-- Sitio Web Interactivo y Catálogo index.html
 ├── urls.txt                              <-- Lista de URLs a procesar (Batch 1)
 ├── urls_db.txt                           <-- Lista de URLs a procesar (Bases de datos)
 ├── requirements.txt                      <-- Dependencias independientes de Python
-├── README.md                             <-- Documentación Técnica de Ejecución
-└── PROJ_001_Agente_Scraper.md           <-- Ficha del Proyecto en el Grafo
+└── README.md                             <-- Documentación Técnica de Ejecución
 ```
 
 ---
@@ -72,8 +71,8 @@ Abre tu navegador en `http://127.0.0.1:8000` para acceder a la aplicación web i
 
 ## 📦 Entregables Generados
 
-1. **Nota Markdown Modular (`casos_de_uso/CU_XXX_slug.md`):**  
-   Archivo de conocimiento estructurado con Frontmatter YAML conforme al Arquitectura Modular, listo para importar en Obsidian.
+1. **Nota Markdown Estructurada (`casos_de_uso/CU_XXX_slug.md`):**  
+   Archivo de conocimiento estructurado con Frontmatter YAML, listo para importar en Obsidian.
 
 2. **Página Web Interactiva (`paginas_web/Web_CU_XXX_slug.html`):**  
    Página web autónoma con diseño dark mode glassmorphism, resaltado de sintaxis, botón de copia y el botón principal **"📥 Descargar Nota .md para Obsidian"**.

@@ -1,6 +1,6 @@
 """
-Exportador y Formateador Modular (Open Knowledge Format) para Casos de Uso del PROJ_001_Agente_Scraper.
-Genera archivos Markdown estandarizados en 03_Proyectos/PROJ_001_Agente_Scraper/casos_de_uso/
+Exportador y Formateador de Notas de Conocimiento para Casos de Uso de Agente Scraper.
+Genera archivos Markdown estandarizados en casos_de_uso/
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ class OKFExporter:
         return max_id + 1
 
     def export_use_case(self, analysis: Dict[str, Any], source_url: str) -> Path:
-        """Genera el archivo .md estructurado bajo el Arquitectura Modular."""
+        """Genera el archivo .md estructurado con Frontmatter YAML."""
         next_num = self._get_next_id()
         id_str = f"CU-{next_num:03d}"
         
@@ -107,7 +107,7 @@ class OKFExporter:
         body_content = f"""# 💡 {title}
 
 > **Origen:** [{source_url}]({source_url})  
-> **Complejidad:** `{complexity}` | **Estándar:** `v1.0.0`
+> **Complejidad:** `{complexity}` | **Formato:** `Markdown / Obsidian`
 
 ---
 

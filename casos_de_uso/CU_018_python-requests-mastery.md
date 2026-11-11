@@ -27,7 +27,7 @@ semantic_summary: Requests es la librería estándar de facto para realizar peti
 # 💡 Dominio de Peticiones HTTP con Requests
 
 > **Origen:** [https://docs.python-requests.org/en/latest/user/quickstart/](https://docs.python-requests.org/en/latest/user/quickstart/)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

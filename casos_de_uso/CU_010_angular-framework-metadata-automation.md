@@ -29,7 +29,7 @@ semantic_summary: Este caso de uso explora la automatización, análisis de depe
 # 💡 Análisis y Automatización de Metadatos del Framework Angular
 
 > **Origen:** [https://angular.dev/overview](https://angular.dev/overview)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

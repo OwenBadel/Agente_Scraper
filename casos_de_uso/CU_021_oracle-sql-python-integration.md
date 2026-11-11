@@ -29,7 +29,7 @@ semantic_summary: Oracle SQL es un lenguaje declarativo de alto nivel diseñado 
 # 💡 Orquestación de SQL en Oracle AI Database con Python
 
 > **Origen:** [https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/sql.html](https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/sql.html)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

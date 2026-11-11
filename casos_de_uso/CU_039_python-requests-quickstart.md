@@ -28,7 +28,7 @@ semantic_summary: La librería Requests es el estándar de facto en el ecosistem
 # 💡 Consumo de APIs y Peticiones HTTP con Python Requests
 
 > **Origen:** [https://docs.python-requests.org/en/latest/user/quickstart/](https://docs.python-requests.org/en/latest/user/quickstart/)  
-> **Complejidad:** `basic` | **Estándar:** `v1.0.0`
+> **Complejidad:** `basic` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

@@ -28,7 +28,7 @@ semantic_summary: Herramienta conceptual y de automatización para gestionar la 
 # 💡 Automatización y Gestión de Entornos Laravel en Python
 
 > **Origen:** [https://laravel-com.translate.goog/framework/docs/installation?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc](https://laravel-com.translate.goog/framework/docs/installation?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

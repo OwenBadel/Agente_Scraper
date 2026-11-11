@@ -29,7 +29,7 @@ semantic_summary: Microsoft SQL es un ecosistema de base de datos relacional que
 # 💡 Integración y Patrones de Acceso a Microsoft SQL Server
 
 > **Origen:** [https://learn.microsoft.com/en-us/sql/?view=sql-server-ver17](https://learn.microsoft.com/en-us/sql/?view=sql-server-ver17)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

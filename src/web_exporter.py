@@ -356,7 +356,7 @@ class WebExporter:
             </div>
 
             <div class="cta-bar">
-                <span>Estándar de Conocimiento: <strong>v1.0.0 (Obsidian)</strong></span>
+                <span>Formato de Conocimiento: <strong>Markdown Estructurado (Obsidian)</strong></span>
                 <!-- BOTÓN PRINCIPAL DE DESCARGA DIRECTA DE ARCHIVO .MD PARA OBSIDIAN -->
                 <a id="downloadBtn" class="download-btn" href="data:text/markdown;base64,{b64_md}" download="{md_filename}">
                     📥 Descargar Nota .md para Obsidian
@@ -387,7 +387,7 @@ class WebExporter:
         </div>
 
         <footer>
-            <p>PROJ_001_Agente_Scraper | Ingeniería de Software (Modular & Obsidian)</p>
+            <p>Owen Badel Hooker — Ingeniero de Sistemas | Agente Scraper & Obsidian</p>
         </footer>
     </div>
 

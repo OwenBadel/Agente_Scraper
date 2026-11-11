@@ -31,7 +31,7 @@ semantic_summary: n8n es una herramienta de automatización de flujos de trabajo
 # 💡 Automatización de Workflows e Integración MCP con n8n
 
 > **Origen:** [https://docs.n8n.io/](https://docs.n8n.io/)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

@@ -132,7 +132,9 @@
                     <!-- Presets Rápidos de 1 Clic -->
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="text-[11px] font-mono text-slate-500">Ejemplos:</span>
-                        <button onclick="setPreset('https://docs.python-requests.org/en/latest/user/quickstart/')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">Requests</button>
+                        <button onclick="setPreset('https://pandas.pydata.org/docs/user_guide/10min.html')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">📊 Pandas</button>
+                        <button onclick="setPreset('https://docs.pola.rs/user-guide/getting-started/')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">⚡ Polars</button>
+                        <button onclick="setPreset('https://duckdb.org/docs/api/python/overview')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">🦆 DuckDB</button>
                         <button onclick="setPreset('https://fastapi.tiangolo.com/tutorial/first-steps/')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">FastAPI</button>
                         <button onclick="setPreset('https://tailwindcss.com/docs/installation/using-vite')" class="text-[11px] font-mono px-2 py-0.5 bg-slate-900 hover:bg-clinical-teal/40 text-slate-300 hover:text-cyan-accent border border-slate-800 rounded transition">Tailwind</button>
                     </div>
@@ -350,7 +352,7 @@
 
             // 1. Nombre de la Documentación
             document.getElementById('res-doc-title').innerText = item.title || 'Documentación Técnica';
-            document.getElementById('res-node-id').innerText = item.mcp_node_id || 'CU-Modular';
+            document.getElementById('res-node-id').innerText = item.mcp_node_id || 'CU-DOC';
             document.getElementById('res-complexity').innerText = item.complexity || 'intermediate';
             
             const srcLink = document.getElementById('res-source-url');

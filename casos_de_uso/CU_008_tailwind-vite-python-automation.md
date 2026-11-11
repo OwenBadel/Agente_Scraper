@@ -29,7 +29,7 @@ semantic_summary: Tailwind CSS v4 introduce una integración nativa con Vite a t
 # 💡 Automatización y Gestión de Tailwind CSS v4 con Vite
 
 > **Origen:** [https://tailwindcss.com/docs/installation/using-vite](https://tailwindcss.com/docs/installation/using-vite)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

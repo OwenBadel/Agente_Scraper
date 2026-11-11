@@ -27,7 +27,7 @@ semantic_summary: Guía práctica y avanzada para el uso de la librería Request
 # 💡 Consumo eficiente de APIs con Python Requests
 
 > **Origen:** [https://docs.python-requests.org/en/latest/user/quickstart/](https://docs.python-requests.org/en/latest/user/quickstart/)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

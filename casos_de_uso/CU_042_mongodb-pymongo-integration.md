@@ -28,7 +28,7 @@ semantic_summary: MongoDB es una base de datos orientada a documentos diseñada 
 # 💡 Integración y Operación con MongoDB utilizando PyMongo
 
 > **Origen:** [https://www.mongodb.com/es/docs/](https://www.mongodb.com/es/docs/)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

@@ -26,7 +26,7 @@ semantic_summary: Implementación de patrones de conexión y monitoreo para base
 # 💡 Resiliencia y Conectividad Robusta con MySQL
 
 > **Origen:** [https://dev.mysql.com/doc/](https://dev.mysql.com/doc/)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

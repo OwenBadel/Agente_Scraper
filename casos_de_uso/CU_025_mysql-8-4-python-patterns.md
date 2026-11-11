@@ -29,7 +29,7 @@ semantic_summary: MySQL 8.4 LTS introduce mejoras significativas en la gestión 
 # 💡 Conectividad y Patrones de Resiliencia con MySQL 8.4
 
 > **Origen:** [https://dev.mysql.com/doc/refman/8.4/en/](https://dev.mysql.com/doc/refman/8.4/en/)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

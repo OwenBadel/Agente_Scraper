@@ -29,7 +29,7 @@ semantic_summary: Este documento explora los fundamentos y capacidades avanzadas
 # 💡 Gestión Avanzada y Consultas SQL en PostgreSQL con Psycopg
 
 > **Origen:** [https://www.postgresql.org/docs/current/sql.html](https://www.postgresql.org/docs/current/sql.html)  
-> **Complejidad:** `advanced` | **Estándar:** `v1.0.0`
+> **Complejidad:** `advanced` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

@@ -31,7 +31,7 @@ semantic_summary: Node.js es un entorno de ejecución orientado a eventos y E/S 
 # 💡 Arquitectura de Servicios y Gestión de Recursos con Python (Inspirado en Node.js Core)
 
 > **Origen:** [https://nodejs.org/docs/latest/api/](https://nodejs.org/docs/latest/api/)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

@@ -29,7 +29,7 @@ semantic_summary: CSS (Cascading Style Sheets) es el lenguaje estándar para def
 # 💡 Automatización y Procesamiento de CSS con Python
 
 > **Origen:** [https://developer.mozilla.org/es/docs/Web/CSS](https://developer.mozilla.org/es/docs/Web/CSS)  
-> **Complejidad:** `intermediate` | **Estándar:** `v1.0.0`
+> **Complejidad:** `intermediate` | **Estándar:** `Markdown / Obsidian`
 
 ---
 

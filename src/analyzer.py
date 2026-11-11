@@ -15,7 +15,7 @@ class DocAnalyzer:
 
     def analyze(self, extracted_data: Dict[str, Any], existing_skills: List[str] = None) -> Dict[str, Any]:
         """
-        Analiza la documentación extraída y genera la estructura para el archivo Modular.
+        Analiza la documentación extraída y genera la estructura para la nota de conocimiento.
         """
         url = extracted_data.get("url", "")
         doc_title = extracted_data.get("title", "")
@@ -23,7 +23,7 @@ class DocAnalyzer:
         code_blocks = extracted_data.get("code_blocks", [])[:8]
 
         system_instruction = (
-            "Eres un Arquitecto de Software y Desarrollador Senior de una Ingeniería de Software. "
+            "Eres un Arquitecto de Software y Desarrollador Senior. "
             "Tu misión es analizar la documentación técnica y código extraído de una librería o herramienta "
             "y generar EXACTAMENTE 3 casos de uso prácticos, progresivos y con scripts minimalistas de Python.\n\n"
             "Directivas de Calidad e Innovación (Inspirado en los casos de CSS y Node.js):\n"
